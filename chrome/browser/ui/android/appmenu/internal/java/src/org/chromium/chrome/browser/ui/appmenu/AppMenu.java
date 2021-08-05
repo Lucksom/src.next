@@ -61,6 +61,38 @@ import org.chromium.ui.widget.AnchoredPopupWindow;
 import org.chromium.ui.widget.FlyoutPopupSpecCalculator;
 import org.chromium.ui.widget.RectProvider;
 
+import android.util.Log;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+
+import android.app.Activity;
+import java.util.Hashtable;
+
+import androidx.appcompat.view.menu.MenuBuilder;
+
+import org.chromium.chrome.browser.app.ChromeActivity;
+
+import org.chromium.base.annotations.NativeMethods;
+import org.chromium.chrome.browser.tabmodel.TabCreator;
+import org.chromium.content_public.browser.LoadUrlParams;
+
+import org.chromium.chrome.browser.tab.Tab;
+import org.chromium.ui.mojom.WindowOpenDisposition;
+import org.chromium.base.ContextUtils;
+import org.chromium.chrome.browser.profiles.Profile;
+import org.chromium.base.ThreadUtils;
+import org.chromium.base.annotations.CalledByNative;
+import org.chromium.chrome.browser.profiles.Profile;
+import org.chromium.content_public.browser.WebContents;
+
+import org.chromium.chrome.browser.AppMenuBridge;
+import org.chromium.chrome.browser.tab.TabLaunchType;
+import org.chromium.ui.base.PageTransition;
+
+import android.content.ContextWrapper;
+
 /**
  * Shows a popup of menu items anchored to a host view.
  *
