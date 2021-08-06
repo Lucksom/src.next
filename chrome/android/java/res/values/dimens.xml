@@ -13,6 +13,12 @@ found in the LICENSE file.
     <!-- Toolbar IPH dimens. -->
     <dimen name="toolbar_iph_y_inset">4dp</dimen>
 
+    <!-- TabSwitcher -->
+    <dimen name="tabswitcher_border_frame_padding_left">6dp</dimen>
+    <dimen name="tabswitcher_border_frame_padding_top">50dp</dimen>
+    <dimen name="tabswitcher_border_frame_transparent_top">3dp</dimen>
+    <dimen name="tabswitcher_border_frame_transparent_side">2dp</dimen>
+
     <!-- Tab title -->
     <dimen name="border_texture_title_fade">24dp</dimen>                    <!-- 40px hdpi -->
     <dimen name="tab_title_favicon_start_padding">10dp</dimen>

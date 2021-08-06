@@ -170,6 +170,9 @@ TextPaintStyle TextPainterBase::TextPaintingStyle(const Document& document,
     }
   }
 
+  if (paint_info.context.IsDarkModeEnabled())
+    text_style.shadow = nullptr;
+
   return text_style;
 }
 

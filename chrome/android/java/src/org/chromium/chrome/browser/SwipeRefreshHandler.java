@@ -38,6 +38,8 @@ import org.chromium.ui.OverscrollRefreshHandler;
 import org.chromium.ui.base.BackGestureEventSwipeEdge;
 import org.chromium.ui.base.WindowAndroid;
 
+import org.chromium.base.ContextUtils;
+
 /**
  * An overscroll handler implemented in terms a modified version of the Android compat library's
  * SwipeRefreshLayout effect.

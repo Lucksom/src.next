@@ -46,6 +46,8 @@ public class DownloadSettings extends ChromeBaseSettingsFragment
     private final SettableMonotonicObservableSupplier<String> mPageTitle =
             ObservableSuppliers.createMonotonic();
 
+    private ChromeBaseCheckBoxPreference mExternalDownloadManager;
+
     @Override
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String s) {
         mPageTitle.set(getString(R.string.menu_downloads));
@@ -159,6 +161,36 @@ public class DownloadSettings extends ChromeBaseSettingsFragment
             }
         } else if (PREF_AUTO_OPEN_PDF_ENABLED.equals(preference.getKey())) {
             UserPrefs.get(getProfile()).setBoolean(Pref.AUTO_OPEN_PDF_ENABLED, (boolean) newValue);
+        }
+        else if ("enable_external_download_manager".equals(preference.getKey())) {
+            SharedPreferences.Editor sharedPreferencesEditor = ContextUtils.getAppSharedPreferences().edit();
+            sharedPreferencesEditor.putBoolean("enable_external_download_manager", (boolean)newValue);
+            sharedPreferencesEditor.apply();
+            if ((boolean)newValue == true) {
+                    List<Intent> targetedShareIntents = new ArrayList<Intent>();
+                    Intent shareIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://test.com/file.rar"));
+                    // Set title and text to share when the user selects an option.
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, "http://test.com/file.rar");
+                    List<ResolveInfo> resInfo = getActivity().getPackageManager().queryIntentActivities(shareIntent, 0);
+                    if (!resInfo.isEmpty()) {
+                        for (ResolveInfo info : resInfo) {
+                            if (!"com.kiwibrowser.browser".equalsIgnoreCase(info.activityInfo.packageName)) {
+                                Intent targetedShare = new Intent(android.content.Intent.ACTION_VIEW);
+                                targetedShare.setPackage(info.activityInfo.packageName.toLowerCase(Locale.ROOT));
+                                targetedShareIntents.add(targetedShare);
+                            }
+                        }
+                        // Then show the ACTION_PICK_ACTIVITY to let the user select it
+                        Intent intentPick = new Intent();
+                        intentPick.setAction(Intent.ACTION_PICK_ACTIVITY);
+                        // Set the title of the dialog
+                        intentPick.putExtra(Intent.EXTRA_TITLE, "Download manager");
+                        intentPick.putExtra(Intent.EXTRA_INTENT, shareIntent);
+                        intentPick.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetedShareIntents.toArray());
+                        // Call StartActivityForResult so we can get the app name selected by the user
+                        this.startActivityForResult(intentPick, /* REQUEST_CODE_MY_PICK */ 4242);
+                    }
+            }
         }
         return true;
     }

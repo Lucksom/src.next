@@ -131,7 +131,7 @@ import java.util.function.Supplier;
 public class ToolbarPhone extends ToolbarLayout
         implements OmniboxSuggestionsDropdownScrollListener, ToolbarDataProvider.Observer {
     /** The amount of time transitioning from one theme color to another should take in ms. */
-    public static final long THEME_COLOR_TRANSITION_DURATION = 250;
+    public static final long THEME_COLOR_TRANSITION_DURATION = 250; // In theory 417, since we have sped-up animation 0.6 in Kiwi, so we could adjust back to make it slower
 
     public static final int URL_FOCUS_CHANGE_ANIMATION_DURATION_MS = 225;
     private static final int URL_FOCUS_TOOLBAR_BUTTONS_DURATION_MS = 100;
@@ -700,6 +700,34 @@ public class ToolbarPhone extends ToolbarLayout
         return super.onTouchEvent(ev);
     }
 
+    public void openOverscroll() {
+        Tab currentTab = getToolbarDataProvider().getTab();
+        if (currentTab == null) return;
+
+        String SCRIPT = "var _kbOverscroll;"
++"(function (d) {"
++   " if (typeof _kbOverscroll == 'undefined' || _kbOverscroll == false) {"
++        "d.getElementsByTagName('html')[0].style.transition = '0.5s ease-in-out';"
++        "d.getElementsByTagName('html')[0].style.transform = 'translate(0px, 98vw)';"
++        "d.getElementsByTagName('html')[0].style.overflowY = 'initial';"
++        "d.getElementsByTagName('body')[0].style.display='block';"
++        "d.getElementsByTagName('body')[0].style.position='fixed';"
++        "d.getElementsByTagName('body')[0].style.overflowY='scroll';"
++        "d.getElementsByTagName('body')[0].style.height='98vw';"
++        "window.scrollTo({top: 0,left: 0,behavior: 'smooth' });"
++        "_kbOverscroll = true;"
++    "} else {"
++        "d.getElementsByTagName('html')[0].style.transition = '0.5s ease-in-out';"
++        "d.getElementsByTagName('html')[0].style.transform = '';"
++        "d.getElementsByTagName('html')[0].style.overflowY = 'initial';"
++        "d.getElementsByTagName('body')[0].style.display='';"
++        "d.getElementsByTagName('body')[0].style.position='initial';"
++        "d.getElementsByTagName('body')[0].style.overflowY='auto';"
++        "d.getElementsByTagName('body')[0].style.height='';"
++        "_kbOverscroll = false;}}(document));";
+        currentTab.getWebContents().evaluateJavaScript(SCRIPT, null);
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         // In case the call came from the handler after we destroyed the dependencies, skip the work
@@ -989,6 +1017,12 @@ public class ToolbarPhone extends ToolbarLayout
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
+        try {
+            ValueAnimator.class.getMethod("setDurationScale", float.class).invoke(null, 0.0f);
+        } catch (Throwable t) {
+
+        }
+
         if (!mTextureCaptureMode && mToolbarBackground.getColor() != Color.TRANSPARENT) {
             // Update to compensate for orientation changes.
             mToolbarBackground.setBounds(0, 0, getWidth(), getHeight());
@@ -1015,6 +1049,11 @@ public class ToolbarPhone extends ToolbarLayout
             drawWithoutBackground(canvas);
         } else {
             super.dispatchDraw(canvas);
+        }
+        try {
+            ValueAnimator.class.getMethod("setDurationScale", float.class).invoke(null, 0.60f);
+        } catch (Throwable t) {
+
         }
     }
 
@@ -1264,6 +1303,9 @@ public class ToolbarPhone extends ToolbarLayout
             mHomeButton.setVisibility(View.GONE);
         } else if (mHomeButton.getVisibility() != GONE) {
             mHomeButton.setVisibility(toolbarButtonVisibility);
+        }
+        if (mHandButton != null && mHandButton.getVisibility() != GONE) {
+            mHandButton.setVisibility(toolbarButtonVisibility);
         }
 
         if (mBackButtonCoordinator != null) {
@@ -2142,6 +2184,10 @@ public class ToolbarPhone extends ToolbarLayout
 
         if (getTabSwitcherButtonCoordinator() != null) {
             getTabSwitcherButtonCoordinator().setHasSpaceToShow(!shouldModifyToolbarButtons);
+        }
+        if (mHandButton != null) {
+          if (!ContextUtils.getAppSharedPreferences().getBoolean("enable_bottom_toolbar", false) || !ContextUtils.getAppSharedPreferences().getBoolean("enable_overscroll_button", true))
+            mHandButton.setVisibility(GONE);
         }
     }
 

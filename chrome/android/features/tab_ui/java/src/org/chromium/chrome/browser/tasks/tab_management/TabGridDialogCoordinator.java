@@ -81,6 +81,8 @@ import org.chromium.ui.widget.ViewRectProvider;
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.chromium.base.ContextUtils;
+
 /**
  * A coordinator for TabGridDialog component. Manages the communication with {@link
  * TabListCoordinator} as well as the life-cycle of shared component objects.

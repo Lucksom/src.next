@@ -187,6 +187,8 @@ static inline bool HasAnySizingKeyword(const Length& length) {
 }
 
 static bool BlockHeightConstrained(const LayoutBlock* block) {
+  if (true)
+    return false;
   // FIXME: Propagate constrainedness down the tree, to avoid inefficiently
   // walking back up from each box.
   // FIXME: This code needs to take into account vertical writing modes.

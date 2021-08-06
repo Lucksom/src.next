@@ -204,7 +204,10 @@ struct NewTabURLDetails {
       return NewTabURLDetails(local_url, NEW_TAB_URL_BLOCKED);
     }
 
+#if 0
     return NewTabURLDetails(search_provider_url, NEW_TAB_URL_VALID);
+#endif
+    return NewTabURLDetails(local_url, NEW_TAB_URL_VALID);
   }
 
   const GURL url;

@@ -73,6 +73,10 @@ void DownloadDialogBridge::ShowDialog(
 
   is_dialog_showing_ = true;
 
+  std::string url_to_download = "";
+  if (download && !(download->GetURL().is_empty()))
+      url_to_download = download->GetURL().spec();
+
   JNIEnv* env = base::android::AttachCurrentThread();
   Java_DownloadDialogBridge_showDialog(
       env, java_obj_, native_window->GetJavaObject(),

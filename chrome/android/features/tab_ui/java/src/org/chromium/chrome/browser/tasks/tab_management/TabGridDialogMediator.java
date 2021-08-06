@@ -121,6 +121,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.chromium.chrome.browser.homepage.HomepageManager;
+
 /**
  * A mediator for the TabGridDialog component, responsible for communicating with the components'
  * coordinator as well as managing the business logic for dialog show/hide.

@@ -17,6 +17,8 @@
 
 class Profile;
 
+#include "components/download/public/common/download_item.h"
+
 // Contains all the user selection from download dialogs.
 struct DownloadDialogResult {
   DownloadDialogResult();

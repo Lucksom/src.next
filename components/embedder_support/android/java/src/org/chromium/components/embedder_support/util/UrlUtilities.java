@@ -356,7 +356,13 @@ public class UrlUtilities {
         if (LibraryLoader.getInstance().isInitialized()) return isNtpUrl(url);
         return TextUtils.equals(url, UrlConstants.NTP_URL)
                 || TextUtils.equals(url, UrlConstants.NTP_NON_NATIVE_URL)
-                || TextUtils.equals(url, UrlConstants.NTP_ABOUT_URL);
+                || TextUtils.equals(url, UrlConstants.NTP_ABOUT_URL)
+                || TextUtils.equals(url, "chrome-search://local-ntp/local-ntp.html")
+                || TextUtils.equals(url, "chrome-search://local-ntp/incognito-ntp.html")
+                || TextUtils.equals(url, "chrome-search://local-ntp/new-ntp.html")
+                || TextUtils.equals(url, "kiwi-search://local-ntp/local-ntp.html")
+                || TextUtils.equals(url, "kiwi-search://local-ntp/incognito-ntp.html")
+                || TextUtils.equals(url, "kiwi-search://local-ntp/new-ntp.html");
     }
 
     public static String extractPublisherFromPublisherUrl(GURL publisherUrl) {

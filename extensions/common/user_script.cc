@@ -66,7 +66,7 @@ namespace extensions {
 
 // The bitmask for valid user script injectable schemes used by URLPattern.
 enum {
-  kValidUserScriptSchemes = URLPattern::SCHEME_CHROMEUI |
+  kValidUserScriptSchemes = URLPattern::SCHEME_CHROMEUI | URLPattern::SCHEME_CHROMESEARCH |
                             URLPattern::SCHEME_HTTP | URLPattern::SCHEME_HTTPS |
                             URLPattern::SCHEME_FILE | URLPattern::SCHEME_FTP |
                             URLPattern::SCHEME_UUID_IN_PACKAGE
@@ -121,6 +121,7 @@ int UserScript::ValidUserScriptSchemes(bool can_execute_script_everywhere) {
   int valid_schemes = kValidUserScriptSchemes;
   if (!switches::AreExtensionsOnChromeURLsAllowed()) {
     valid_schemes &= ~URLPattern::SCHEME_CHROMEUI;
+    valid_schemes &= ~URLPattern::SCHEME_CHROMESEARCH;
   }
   return valid_schemes;
 }

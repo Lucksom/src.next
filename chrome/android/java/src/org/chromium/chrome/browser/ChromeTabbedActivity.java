@@ -423,6 +423,10 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
+import org.chromium.chrome.browser.homepage.HomepageManager;
+
+import android.animation.ValueAnimator;
+
 /**
  * This is the main activity for ChromeMobile when not running in document mode. All the tabs are
  * accessible via a chrome specific tab switching UI.
@@ -454,7 +458,7 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
     // Maximum delay for initial tab creation. This is for homepage and NTP, not previous tabs
     // restore. This is needed because we do not know when reading PartnerBrowserCustomizations
     // provider will be finished.
-    private static final int INITIAL_TAB_CREATION_TIMEOUT_MS = 500;
+    private static final int INITIAL_TAB_CREATION_TIMEOUT_MS = 1;
 
     /**
      * Sending an intent with this action to Chrome will cause it to close all tabs (iff the

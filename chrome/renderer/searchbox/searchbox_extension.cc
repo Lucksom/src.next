@@ -60,6 +60,8 @@
 #include "v8/include/v8-cppgc.h"
 #include "v8/include/v8.h"
 
+#include "chrome/renderer/chrome_render_thread_observer.h"
+
 namespace {
 
 const char kCSSBackgroundImageFormat[] =
@@ -485,6 +487,7 @@ class NewTabPageBindings : public gin::Wrappable<NewTabPageBindings> {
   static bool IsInputInProgress();
   static v8::Local<v8::Value> GetMostVisited(v8::Isolate* isolate);
   static bool GetMostVisitedAvailable(v8::Isolate* isolate);
+  static bool IsIncognito(v8::Isolate* isolate);
   static v8::Local<v8::Value> GetNtpTheme(v8::Isolate* isolate);
 
   // Handlers for JS functions visible to all NTPs.
@@ -511,6 +514,8 @@ gin::ObjectTemplateBuilder NewTabPageBindings::GetObjectTemplateBuilder(
       .SetProperty("mostVisited", &NewTabPageBindings::GetMostVisited)
       .SetProperty("mostVisitedAvailable",
                    &NewTabPageBindings::GetMostVisitedAvailable)
+      .SetProperty("isIncognito",
+                   &NewTabPageBindings::IsIncognito)
       .SetProperty("ntpTheme", &NewTabPageBindings::GetNtpTheme)
       // TODO(crbug.com/40656475): remove "themeBackgroundInfo" legacy
       // name when we're sure no third-party NTP needs it.
@@ -588,6 +593,10 @@ bool NewTabPageBindings::GetMostVisitedAvailable(v8::Isolate* isolate) {
   }
 
   return search_box->AreMostVisitedItemsAvailable();
+}
+
+bool NewTabPageBindings::IsIncognito(v8::Isolate* isolate) {
+  return ChromeRenderThreadObserver::is_incognito_process();
 }
 
 // static

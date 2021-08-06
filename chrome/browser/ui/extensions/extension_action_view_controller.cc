@@ -47,6 +47,9 @@
 #include "ui/gfx/image/image_skia.h"
 #include "ui/native_theme/native_theme.h"
 
+#include "chrome/browser/ui/android/tab_model/tab_model.h"
+#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
+
 using extensions::ActionInfo;
 using extensions::CommandService;
 using extensions::ExtensionActionRunner;

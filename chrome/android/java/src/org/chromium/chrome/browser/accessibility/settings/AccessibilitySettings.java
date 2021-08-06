@@ -11,6 +11,9 @@ import android.provider.Settings;
 import androidx.annotation.VisibleForTesting;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.appcompat.app.AlertDialog;
+
+import org.chromium.chrome.browser.ApplicationLifetime;
 
 import org.chromium.base.ContextUtils;
 import org.chromium.base.supplier.ObservableSupplier;
@@ -198,6 +201,29 @@ public class AccessibilitySettings extends PreferenceFragmentCompat
         } else if (OmniboxFeatures.KEY_JUMP_START_OMNIBOX.equals(preference.getKey())) {
             OmniboxFeatures.setJumpStartOmniboxEnabled((Boolean) newValue);
         }
+
         return true;
+    }
+
+    public static void AskForRelaunch(Activity activity) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
+         alertDialogBuilder
+            .setMessage(R.string.preferences_restart_is_needed)
+            .setCancelable(true)
+            .setPositiveButton(R.string.preferences_restart_now, new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialog, int id) {
+                  ApplicationLifetime.terminate(true);
+                  dialog.cancel();
+              }
+            })
+            .setNegativeButton(R.string.preferences_restart_later, new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialog,int id) {
+                  dialog.cancel();
+              }
+            });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
     }
 }

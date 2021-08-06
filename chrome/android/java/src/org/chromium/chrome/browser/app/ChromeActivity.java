@@ -47,6 +47,9 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.CallSuper;
 import androidx.annotation.VisibleForTesting;
 
+import org.chromium.chrome.browser.browsing_data.ClearBrowsingDataTabsFragment;
+import org.chromium.chrome.browser.settings.SettingsLauncherImpl;
+import org.chromium.components.browser_ui.settings.SettingsLauncher;
 import org.chromium.base.ActivityState;
 import org.chromium.base.ApplicationStatus;
 import org.chromium.base.Callback;
@@ -79,6 +82,7 @@ import org.chromium.chrome.browser.ChromeActivitySessionTracker;
 import org.chromium.chrome.browser.ChromeApplicationImpl;
 import org.chromium.chrome.browser.ChromeKeyboardVisibilityDelegate;
 import org.chromium.chrome.browser.ChromeWindow;
+import org.chromium.components.content_settings.ContentSettingValues;
 import org.chromium.chrome.browser.DeferredStartupHandler;
 import org.chromium.chrome.browser.IntentHandler;
 import org.chromium.chrome.browser.PlayServicesVersionInfo;
@@ -127,6 +131,7 @@ import org.chromium.chrome.browser.feature_engagement.TrackerFactory;
 import org.chromium.chrome.browser.feedback.FeedbackPolicyManager;
 import org.chromium.chrome.browser.feedback.HelpAndFeedbackLauncherImpl;
 import org.chromium.chrome.browser.firstrun.ForcedSigninProcessor;
+import org.chromium.chrome.browser.ApplicationLifetime;
 import org.chromium.chrome.browser.flags.ActivityType;
 import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.chrome.browser.flags.ChromeSessionState;
@@ -284,8 +289,22 @@ import org.chromium.ui.theme.ThemeResourceWrapper;
 import org.chromium.ui.theme.ThemeResourceWrapperProvider;
 import org.chromium.url.GURL;
 
+import org.chromium.chrome.browser.night_mode.ThemeType;
+import org.chromium.components.content_settings.ContentSettingsType;
+import org.chromium.components.browser_ui.site_settings.SiteSettingsCategory;
+import org.chromium.components.browser_ui.site_settings.WebsitePreferenceBridge;
+import org.chromium.components.browser_ui.site_settings.WebsitePreferenceBridgeJni;
+import org.chromium.base.IntentUtils;
+
+import org.chromium.ui.widget.Toast;
+import org.chromium.chrome.browser.AppMenuBridge;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import org.chromium.chrome.browser.night_mode.WebContentsDarkModeController;
+import org.chromium.base.ContextUtils;
+import org.chromium.chrome.browser.night_mode.ThemeType;
 
 /**
  * A {@link AsyncInitializationActivity} that builds and manages a {@link CompositorViewHolder} and
@@ -3059,6 +3078,108 @@ public abstract class ChromeActivity extends AsyncInitializationActivity
             Tracker tracker = TrackerFactory.getTrackerForProfile(currentTab.getProfile());
             tracker.notifyEvent(EventConstants.TRANSLATE_MENU_BUTTON_CLICKED);
             TranslateBridge.translateTabWhenReady(currentTab);
+            } else {
+            String url = currentTab.getUrl().getSpec();
+            if (currentTab != null && !url.isEmpty()) {
+                boolean hasTranslated = false;
+
+              if (ContextUtils.getAppSharedPreferences().getString("active_translator", "").equals("Google")) {
+                hasTranslated = false;
+                try {
+                   if (url != null
+                     &&
+                      (
+                            url.startsWith("https://translate.google.com/")
+                        ||  url.startsWith("https://translate.googleusercontent.com/")
+                        ||  url.startsWith("http://translate.google.com/")
+                        ||  url.startsWith("http://translate.googleusercontent.com/")
+                        ||  url.contains(".translate.goog/")
+                     )
+                    ) {
+                       Uri uri = Uri.parse(url);
+                       String paramValue = uri.getQueryParameter("u");
+                       LoadUrlParams loadUrlParams = new LoadUrlParams(paramValue);
+                       currentTab.loadUrl(loadUrlParams);
+                       hasTranslated = true;
+                   }
+                } catch (Exception e) {
+                }
+                if (!hasTranslated) {
+                    LoadUrlParams loadUrlParams = new LoadUrlParams("http://translate.google.com/translate?sl=auto&tl=auto&u=" + Uri.encode(url));
+                    currentTab.loadUrl(loadUrlParams);
+                }
+              } else if (ContextUtils.getAppSharedPreferences().getString("active_translator", "").equals("Yandex")) {
+                hasTranslated = false;
+                try {
+                   if (url != null
+                     &&
+                      (
+                            url.startsWith("https://translate.yandex.com/")
+                        ||  url.startsWith("http://translate.yandex.com/")
+                     )
+                    ) {
+                       Uri uri = Uri.parse(url);
+                       String paramValue = uri.getQueryParameter("u");
+                       LoadUrlParams loadUrlParams = new LoadUrlParams(paramValue);
+                       currentTab.loadUrl(loadUrlParams);
+                       hasTranslated = true;
+                   }
+                } catch (Exception e) {
+                }
+                if (!hasTranslated) {
+                    LoadUrlParams loadUrlParams = new LoadUrlParams("https://translate.yandex.com/?text=" + Uri.encode(url));
+                    currentTab.loadUrl(loadUrlParams);
+                }
+              } else if (ContextUtils.getAppSharedPreferences().getString("active_translator", "").equals("Baidu")) {
+                hasTranslated = false;
+                try {
+                   if (url != null
+                     &&
+                      (
+                            url.startsWith("https://fanyi.baidu.com/")
+                        ||  url.startsWith("http://fanyi.baidu.com/")
+                     )
+                    ) {
+                       Uri uri = Uri.parse(url);
+                       String paramValue = uri.getQueryParameter("query");
+                       LoadUrlParams loadUrlParams = new LoadUrlParams(paramValue);
+                       currentTab.loadUrl(loadUrlParams);
+                       hasTranslated = true;
+                   }
+                } catch (Exception e) {
+                }
+                if (!hasTranslated) {
+                    LoadUrlParams loadUrlParams = new LoadUrlParams("http://fanyi.baidu.com/transpage?source=url&ie=utf8&from=auto&to=zh&render=1&query=" + Uri.encode(url));
+                    currentTab.loadUrl(loadUrlParams);
+                }
+              } else {
+                try {
+                   if (url != null
+                     &&
+                      (
+                          url.contains("www.microsofttranslator.com/bv.aspx")
+                       || url.contains("translatetheweb.com")
+                       || url.contains("translatetheweb.net")
+                       || url.contains("translatetheweb-int.net")
+                       || url.contains("translatoruser.com")
+                       || url.contains("translatoruser.net")
+                     )
+                    ) {
+                       Uri uri = Uri.parse(url);
+                       String paramValue = uri.getQueryParameter("a");
+                       LoadUrlParams loadUrlParams = new LoadUrlParams(paramValue);
+                       currentTab.loadUrl(loadUrlParams);
+                       hasTranslated = true;
+                   }
+                } catch (Exception e) {
+                }
+                if (!hasTranslated) {
+                    LoadUrlParams loadUrlParams = new LoadUrlParams("http://www.microsofttranslator.com/bv.aspx?r=true&a=" + Uri.encode(url));
+                    currentTab.loadUrl(loadUrlParams);
+                }
+             }
+            }
+            }
             return true;
         }
 

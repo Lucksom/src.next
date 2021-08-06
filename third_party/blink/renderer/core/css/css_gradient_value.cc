@@ -159,6 +159,11 @@ scoped_refptr<Image> CSSGradientValue::GetImage(
     return nullptr;
   }
 
+  auto* settings = document.GetFrame()->GetSettings();
+  if (settings && settings->GetForceDarkModeEnabled()) {
+    return nullptr;
+  }
+
   if (is_cacheable_) {
     if (!Clients().Contains(&client)) {
       return nullptr;

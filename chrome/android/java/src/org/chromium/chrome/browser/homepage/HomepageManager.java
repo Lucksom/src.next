@@ -43,6 +43,8 @@ import org.chromium.content_public.common.ContentUrlConstants;
 import org.chromium.ui.base.PageTransition;
 import org.chromium.url.GURL;
 
+import org.chromium.base.ContextUtils;
+
 /**
  * Provides information regarding homepage enabled states and URI.
  *

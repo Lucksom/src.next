@@ -34,8 +34,8 @@ using csp_validator::SanitizeContentSecurityPolicy;
 namespace {
 
 const char kDefaultContentSecurityPolicy[] =
-    "script-src 'self' blob: filesystem:; "
-    "object-src 'self' blob: filesystem:;";
+    "script-src 'self' blob: filesystem: 'wasm-eval'; "
+    "object-src 'self' blob: filesystem:; ";
 
 const char kDefaultSandboxedPageContentSecurityPolicy[] =
     "sandbox allow-scripts allow-forms allow-popups allow-modals; "
