@@ -121,7 +121,7 @@ public class SelectionPopupControllerImpl extends ActionModeCallbackHelper
     // stops dragging a selection handle, in turn showing the ActionMode, the
     // selection change response will be asynchronous. 300ms should accomodate
     // most such trailing, async delays.
-    private static final int SHOW_DELAY_MS = 310;
+    private static final int SHOW_DELAY_MS = 300;
 
     private static final String USED_CACHED_MENU_HISTOGRAM = "Android.SelectionMenu.UsedCachedMenu";
 
