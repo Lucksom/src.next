@@ -42,13 +42,13 @@ found in the LICENSE file.
             android:icon="@drawable/menu_update" />
         <item android:id="@+id/new_tab_menu_id"
             android:title="@string/menu_new_tab"
-            android:icon="@drawable/ic_add_box_rounded_corner" />
+            android:icon="@drawable/ic_new_tab" />
         <item android:id="@+id/new_incognito_tab_menu_id"
             android:title="@string/menu_new_incognito_tab"
             android:icon="@drawable/ic_incognito" />
         <item android:id="@+id/new_window_menu_id"
             android:title="@string/menu_new_window"
-            android:icon="@drawable/ic_new_window_r" />
+            android:icon="@drawable/ic_new_tab" />
         <item android:id="@+id/move_to_other_window_menu_id"
             android:title="@string/menu_move_to_other_window"
             android:icon="@drawable/ic_open_in_browser" />
@@ -178,7 +178,7 @@ found in the LICENSE file.
         android:visible="false">
         <item android:id="@id/new_tab_menu_id"
             android:title="@string/menu_new_tab"
-            android:icon="@drawable/ic_add_box_rounded_corner" />
+            android:icon="@drawable/ic_new_tab" />
         <item android:id="@id/new_incognito_tab_menu_id"
             android:title="@string/menu_new_incognito_tab"
             android:icon="@drawable/ic_incognito" />
@@ -207,7 +207,7 @@ found in the LICENSE file.
         android:visible="false">
         <item android:id="@id/new_tab_menu_id"
             android:title="@string/menu_new_tab"
-            android:icon="@drawable/ic_add_box_rounded_corner" />
+            android:icon="@drawable/ic_new_tab" />
         <item android:id="@id/new_incognito_tab_menu_id"
             android:title="@string/menu_new_incognito_tab"
             android:icon="@drawable/ic_incognito" />
