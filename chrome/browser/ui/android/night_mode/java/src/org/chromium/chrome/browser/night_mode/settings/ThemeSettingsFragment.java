@@ -84,6 +84,7 @@ public class ThemeSettingsFragment extends ChromeBaseSettingsFragment
                     getArguments().getInt(KEY_THEME_SETTINGS_ENTRY));
         }
 
+        if (false)
         if (ChromeFeatureList.isEnabled(
                 ChromeFeatureList.DARKEN_WEBSITES_CHECKBOX_IN_THEMES_SETTING)) {
             WebContentsDarkModeMessageController.notifyEventSettingsOpened(getProfile());
