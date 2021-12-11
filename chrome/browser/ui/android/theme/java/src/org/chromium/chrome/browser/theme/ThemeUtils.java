@@ -52,6 +52,7 @@ public class ThemeUtils {
         boolean isIncognito = tab != null && tab.isIncognito();
         boolean isLocalNTP = tab != null && tab.getUrl().getSpec().contains("/local-ntp/");
         if (isIncognito && isLocalNTP) return Color.BLACK;
+
         WebContents tabWebContents = tab.getWebContents();
         RenderWidgetHostView rwhv =
                 tabWebContents == null ? null : tabWebContents.getRenderWidgetHostView();
