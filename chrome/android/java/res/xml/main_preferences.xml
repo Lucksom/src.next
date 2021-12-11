@@ -20,8 +20,7 @@ found in the LICENSE file.
         android:order="2"/>
     <org.chromium.components.browser_ui.settings.ChromeBasePreference
         android:key="google_services"
-        android:order="7"
-        android:layout="@layout/account_management_account_row"
+        android:order="14"
         android:title="@string/prefs_google_services"
         android:icon="@drawable/ic_google_services_48dp_with_bg"
         android:fragment="org.chromium.chrome.browser.sync.settings.GoogleServicesSettings"/>
@@ -34,7 +33,23 @@ found in the LICENSE file.
         android:fragment="org.chromium.chrome.browser.search_engines.settings.SearchEngineSettings"
         android:key="search_engine"
         android:order="6"
-        android:title="@string/search_engine_settings"/>
+        android:icon="@drawable/ics_search_engine"
+        android:title="@string/search_engine_settings"
+        app:iconTint="@color/default_icon_color_tint_list"/>
+    <org.chromium.components.browser_ui.settings.ChromeBasePreference
+        android:fragment="org.chromium.chrome.browser.homepage.settings.HomepageSettings"
+        android:key="homepage"
+        android:order="7"
+        android:icon="@drawable/ics_edit_homepage"
+        android:title="@string/options_homepage_title"
+        app:iconTint="@color/default_icon_color_tint_list"/>
+    <org.chromium.components.browser_ui.settings.ChromeBasePreference
+        android:fragment="org.chromium.chrome.browser.language.settings.LanguageSettings"
+        android:key="languages"
+        android:order="20"
+        android:icon="@drawable/ics_languages"
+        android:title="@string/language_settings"
+        app:iconTint="@color/default_icon_color_tint_list"/>
     <org.chromium.components.browser_ui.settings.ChromeBasePreference
         android:fragment="org.chromium.chrome.browser.toolbar.settings.AddressBarSettingsFragment"
         android:key="address_bar"
@@ -130,17 +145,9 @@ found in the LICENSE file.
         android:fragment="org.chromium.chrome.browser.translate.settings.TranslateSettings"
         android:key="translate"
         android:order="20"
-        android:title="@string/main_menu_translate"/>
-    <Preference
-        android:fragment="org.chromium.chrome.browser.settings.TabSwitcherSettings"
-        android:key="tabswitcher"
-        android:order="21"
-        android:title="@string/preferences_tabswitcher"/>
-    <Preference
-        android:fragment="org.chromium.chrome.browser.settings.NightModeSettings"
-        android:key="nightmode"
-        android:order="21"
-        android:title="@string/preferences_nightmode"/>
+        android:icon="@drawable/ic_translate_r"
+        android:title="@string/main_menu_translate"
+        app:iconTint="@color/default_icon_color_tint_list"/>
     <org.chromium.components.browser_ui.settings.ChromeBasePreference
         android:fragment="org.chromium.chrome.browser.download.settings.DownloadSettings"
         android:key="downloads"
