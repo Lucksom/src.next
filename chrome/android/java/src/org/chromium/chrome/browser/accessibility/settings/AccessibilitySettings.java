@@ -126,6 +126,17 @@ public class AccessibilitySettings extends PreferenceFragmentCompat
                 mPrefService.getBoolean(Pref.READER_FOR_ACCESSIBILITY));
         readerForAccessibilityPref.setOnPreferenceChangeListener(this);
 
+        ChromeBaseCheckBoxPreference mAccessibilityTabSwitcherPref =
+                (ChromeBaseCheckBoxPreference) findPreference(
+                        ChromePreferenceKeys.ACCESSIBILITY_TAB_SWITCHER);
+        if (ChromeAccessibilityUtil.get().isAccessibilityEnabled()) {
+            mAccessibilityTabSwitcherPref.setChecked(
+                    SharedPreferencesManager.getInstance().readBoolean(
+                            ChromePreferenceKeys.ACCESSIBILITY_TAB_SWITCHER, true));
+        } else {
+            getPreferenceScreen().removePreference(mAccessibilityTabSwitcherPref);
+        }
+
         Preference captions = findPreference(PREF_CAPTIONS);
         captions.setOnPreferenceClickListener(
                 preference -> {
@@ -169,6 +180,9 @@ public class AccessibilitySettings extends PreferenceFragmentCompat
         Preference imageDescriptionsPreference = findPreference(PREF_IMAGE_DESCRIPTIONS);
         imageDescriptionsPreference.setVisible(
                 ImageDescriptionsController.getInstance().shouldShowImageDescriptionsMenuItem());
+
+        ((ChromeBaseCheckBoxPreference) findPreference("text_rewrap")).setOnPreferenceChangeListener(this);
+        ((ChromeBaseCheckBoxPreference) findPreference("show_extensions_first")).setOnPreferenceChangeListener(this);
     }
 
     @Override
