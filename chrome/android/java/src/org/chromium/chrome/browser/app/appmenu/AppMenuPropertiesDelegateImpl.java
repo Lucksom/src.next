@@ -368,6 +368,47 @@ public abstract class AppMenuPropertiesDelegateImpl implements AppMenuProperties
                 .build();
     }
 
+    private void prepareExtensionMenu(
+            Menu menu, @Nullable Tab currentTab, AppMenuHandler handler, boolean isIncognito) {
+
+        WebContents webContents = null;
+        webContents = currentTab != null ? currentTab.getWebContents() : null;
+
+        boolean canShowExtensions = false;
+        if (currentTab != null)
+          canShowExtensions = true;
+
+        int numItems = menu.size();
+
+        if (canShowExtensions) {
+          int itemIndex = numItems++;
+          String extensions = AppMenuBridge.getRunningExtensions(Profile.fromWebContents(webContents).getOriginalProfile(), webContents);
+          if (!extensions.isEmpty()) {
+            String[] extensionsArray = extensions.split("\u001f");
+            for (String extension: extensionsArray) {
+              String[] extensionsInfo = extension.split("\u001e");
+              MenuItem newlyAdded = menu.add(999999, 999999 + itemIndex, Menu.NONE, extensionsInfo[0]);
+              if (extensionsInfo.length > 1) {
+                newlyAdded.setTitleCondensed("Extension: " + extensionsInfo[1]);
+              }
+
+              if (extensionsInfo.length > 2 && !extensionsInfo[2].equals("")) {
+                newlyAdded.setTitleCondensed("Extension: " + extensionsInfo[1] + ": " + extensionsInfo[2]);
+              }
+
+              if (extensionsInfo.length > 3) {
+                String cleanImage = extensionsInfo[3].replace("data:image/png;base64,", "").replace("data:image/jpeg;base64,","").replace("data:image/gif;base64,", "");
+                byte[] decodedString = Base64.decode(cleanImage, Base64.DEFAULT);
+                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+
+                newlyAdded.setIcon(new BitmapDrawable(mContext.getResources(), decodedByte));
+              }
+              itemIndex++;
+           }
+         }
+       }
+    }
+
     /**
      * Constructs the basis for text menu items models.
      *
