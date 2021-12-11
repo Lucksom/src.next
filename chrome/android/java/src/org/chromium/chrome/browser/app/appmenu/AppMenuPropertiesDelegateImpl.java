@@ -42,8 +42,6 @@ import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.build.annotations.RequiresNonNull;
 import org.chromium.chrome.R;
-import org.chromium.components.content_settings.ContentSettingsType;
-import org.chromium.components.content_settings.ContentSettingValues;
 import org.chromium.chrome.browser.ActivityTabProvider;
 import org.chromium.chrome.browser.accessibility.PageZoomMenuItemViewBinder;
 import org.chromium.chrome.browser.bookmarks.BookmarkModel;
@@ -119,11 +117,26 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
+import java.util.Hashtable;
+
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
+import android.util.Base64InputStream;
+import androidx.appcompat.view.menu.MenuBuilder;
+import org.chromium.chrome.browser.AppMenuBridge;
+import org.chromium.chrome.browser.profiles.Profile;
+import org.chromium.content_public.browser.WebContents;
+
 import org.chromium.components.browser_ui.site_settings.SiteSettingsCategory;
 import org.chromium.components.browser_ui.site_settings.WebsitePreferenceBridge;
 import org.chromium.components.browser_ui.site_settings.WebsitePreferenceBridgeJni;
+import org.chromium.components.content_settings.ContentSettingsType;
+import org.chromium.components.content_settings.ContentSettingValues;
 
 import org.chromium.chrome.browser.AppMenuBridge;
+import org.chromium.base.Log;
 
 /**
  * Base implementation of {@link AppMenuPropertiesDelegate} that handles hiding and showing menu
@@ -617,6 +630,41 @@ public abstract class AppMenuPropertiesDelegateImpl implements AppMenuProperties
                         ? AppMenuHandler.AppMenuItemType.MENU_ITEM_WITH_SUBMENU
                         : AppMenuHandler.AppMenuItemType.MENU_ITEM_WITH_SUBMENU_NO_ICON,
                 model);
+    }
+
+    protected void updateAdblockMenuItem(
+            Menu menu, Tab currentTab, boolean canShowAdblockMenu) {
+        MenuItem adblockMenuRow = menu.findItem(R.id.adblock_row_menu_id);
+        MenuItem adblockMenuLabel = menu.findItem(R.id.adblock_id);
+        MenuItem adblockMenuCheck = menu.findItem(R.id.adblock_check_id);
+
+        String url = currentTab.getUrl().getSpec();
+        boolean isChromeScheme = url.startsWith(UrlConstants.CHROME_URL_PREFIX)
+                || url.startsWith(UrlConstants.CHROME_NATIVE_URL_PREFIX);
+        // Also hide adblock desktop site on Reader Mode.
+        boolean isDistilledPage = DomDistillerUrlUtils.isDistilledPage(url);
+
+        // adsEnabled means "adBlockingEnabled"
+        boolean itemVisible = canShowAdblockMenu
+                && !isChromeScheme && !currentTab.isNativePage() && !isDistilledPage;
+        adblockMenuRow.setVisible(itemVisible);
+        if (!itemVisible) return;
+
+        boolean adBlockIsActive = (WebsitePreferenceBridgeJni.get().isContentSettingEnabled(Profile.getLastUsedRegularProfile(), ContentSettingsType.ADS) == false);
+        if (!adBlockIsActive) {
+            adblockMenuCheck.setChecked(false);
+            adblockMenuLabel.setIcon(R.drawable.ic_adblock_off);
+        } else {
+            int adblockSettingForThisSite = WebsitePreferenceBridgeJni.get().getPermissionSettingForOrigin(Profile.getLastUsedRegularProfile(), ContentSettingsType.ADS, currentTab.getUrl().getSpec(), currentTab.getUrl().getSpec());
+            if (adblockSettingForThisSite == ContentSettingValues.DEFAULT || adblockSettingForThisSite == ContentSettingValues.BLOCK){
+                adblockMenuCheck.setChecked(true);
+                adblockMenuLabel.setIcon(R.drawable.ic_adblock_on);
+            }
+            else {
+                adblockMenuCheck.setChecked(false);
+                adblockMenuLabel.setIcon(R.drawable.ic_adblock_off);
+            }
+       }
     }
 
     /**
