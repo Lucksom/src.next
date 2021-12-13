@@ -131,7 +131,7 @@ import java.util.function.Supplier;
 public class ToolbarPhone extends ToolbarLayout
         implements OmniboxSuggestionsDropdownScrollListener, ToolbarDataProvider.Observer {
     /** The amount of time transitioning from one theme color to another should take in ms. */
-    public static final long THEME_COLOR_TRANSITION_DURATION = 250; // In theory 417, since we have sped-up animation 0.6 in Kiwi, so we could adjust back to make it slower
+    public static final long THEME_COLOR_TRANSITION_DURATION = 50; // In theory 417, since we have sped-up animation 0.6 in Kiwi, so we could adjust back to make it slower
 
     public static final int URL_FOCUS_CHANGE_ANIMATION_DURATION_MS = 225;
     private static final int URL_FOCUS_TOOLBAR_BUTTONS_DURATION_MS = 100;
