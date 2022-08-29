@@ -283,6 +283,120 @@ public class ToolbarTabControllerImpl implements ToolbarTabController {
         return tab != null && tab.canGoBack();
     }
 
+    @Override
+    public void handleBackPress() {
+        boolean ret = back();
+        assert ret;
+    }
+
+    @Override
+    public ObservableSupplier<Boolean> getHandleBackPressChangedSupplier() {
+        return mBackPressChangedSupplier;
+    }
+
+    @Override
+    public void destroy() {
+        if (BackPressManager.isEnabled()) {
+            if (mTabModelObserver != null && mTabModelSelectorSupplier.get() != null) {
+                mTabModelSelectorSupplier.get()
+                        .getTabModelFilterProvider()
+                        .removeTabModelFilterObserver(mTabModelObserver);
+            }
+            mBottomControlsCoordinatorSupplier.removeObserver(
+                    mBottomControlsCoordinatorAvailableCallback);
+        }
+    }
+
+    private void onTabModelSelectorAvailable(TabModelSelector tabModelSelector) {
+        onBackPressedChanged();
+        final WebContentsObserver webContentsObserver = new WebContentsObserver() {
+            @Override
+            public void navigationEntryCommitted(LoadCommittedDetails details) {
+                onBackPressedChanged();
+            }
+
+            @Override
+            public void navigationEntriesDeleted() {
+                onBackPressedChanged();
+            }
+
+            @Override
+            public void navigationEntriesChanged() {
+                onBackPressedChanged();
+            }
+
+            @Override
+            public void frameReceivedUserActivation() {
+                onBackPressedChanged();
+            }
+        };
+
+        mTabModelObserver = new TabModelObserver() {
+            Tab mOldTab;
+            final TabObserver mTabObserver = new EmptyTabObserver() {
+                @Override
+                public void webContentsWillSwap(Tab tab) {
+                    if (tab.getWebContents() != null) {
+                        tab.getWebContents().removeObserver(webContentsObserver);
+                    }
+                }
+
+                @Override
+                public void onWebContentsSwapped(
+                        Tab tab, boolean didStartLoad, boolean didFinishLoad) {
+                    if (tab.getWebContents() != null) {
+                        tab.getWebContents().addObserver(webContentsObserver);
+                    }
+                }
+
+                @Override
+                public void onDestroyed(Tab tab) {
+                    if (tab.getWebContents() != null) {
+                        tab.getWebContents().removeObserver(webContentsObserver);
+                    }
+                }
+            };
+
+            @Override
+            public void didSelectTab(Tab tab, int type, int lastId) {
+                onBackPressedChanged();
+                if (mOldTab != null && mOldTab.getWebContents() != null) {
+                    mOldTab.getWebContents().removeObserver(webContentsObserver);
+                }
+                if (tab.getWebContents() != null) {
+                    tab.getWebContents().addObserver(webContentsObserver);
+                }
+                mOldTab = tab;
+                tab.addObserver(mTabObserver);
+            }
+        };
+        tabModelSelector.getTabModelFilterProvider().addTabModelFilterObserver(mTabModelObserver);
+        mTabModelSelectorSupplier.removeObserver(mTabModelSelectorAvailableCallback);
+    }
+
+    private void onBottomControlsCoordinatorAvailable(
+            BottomControlsCoordinator bottomControlsCoordinator) {
+        onBackPressedChanged();
+        bottomControlsCoordinator.getHandleBackPressChangedSupplier().addObserver(
+                (v) -> this.onBackPressedChanged());
+    }
+
+    private void onBackPressedChanged() {
+        if (mBottomControlsCoordinatorSupplier.get() != null) {
+            BottomControlsCoordinator coordinator = mBottomControlsCoordinatorSupplier.get();
+            if (Boolean.TRUE.equals(coordinator.getHandleBackPressChangedSupplier().get())) {
+                mBackPressChangedSupplier.set(true);
+                return;
+            }
+        }
+        Tab tab = mTabSupplier.get();
+        if (tab != null && tab.canGoBack()) {
+            mBackPressChangedSupplier.set(true);
+            return;
+        }
+        mBackPressChangedSupplier.set(false);
+    }
+
     /** Record that homepage button was used for IPH reasons */
     private void recordHomeButtonUseForIph() {
         Tab tab = mTabSupplier.get();

@@ -323,6 +323,7 @@ LocalFrameView::~LocalFrameView() {
 void LocalFrameView::Trace(Visitor* visitor) const {
   visitor->Trace(part_update_set_);
   visitor->Trace(frame_);
+  visitor->Trace(deferred_to_be_locked_);
   visitor->Trace(update_plugins_timer_);
   visitor->Trace(layout_subtree_root_list_);
   visitor->Trace(fragment_anchor_);
@@ -934,6 +935,16 @@ gfx::SizeF LocalFrameView::LargeViewportSizeForViewportUnits() const {
 
   gfx::SizeF layout_size = SmallViewportSizeForViewportUnits();
 
+  return layout_size;
+}
+
+gfx::SizeF LocalFrameView::LargeViewportSizeForViewportUnits() const {
+  auto* layout_view = GetLayoutView();
+  if (!layout_view)
+    return gfx::SizeF();
+
+  gfx::SizeF layout_size = SmallViewportSizeForViewportUnits();
+
   BrowserControls& browser_controls = frame_->GetPage()->GetBrowserControls();
   if (browser_controls.PermittedState() != cc::BrowserControlsState::kHidden) {
     // We use the layoutSize rather than frameRect to calculate viewport units
@@ -1417,6 +1428,11 @@ void LocalFrameView::LargeViewportUnitsChanged() {
   }
 }
 
+void LocalFrameView::DynamicViewportUnitsChanged() {
+  if (GetFrame().GetDocument())
+    GetFrame().GetDocument()->DynamicViewportUnitsChanged();
+}
+
 bool LocalFrameView::ShouldSetCursor() const {
   Page* page = GetFrame().GetPage();
   return page && page->IsPageVisible() &&
@@ -1888,6 +1904,19 @@ void LocalFrameView::PerformPostLayoutTasks(bool visual_viewport_size_changed) {
   ScheduleUpdatePluginsIfNecessary();
   if (visual_viewport_size_changed && !document->Printing())
     frame_->GetDocument()->EnqueueVisualViewportResizeEvent();
+
+  if (deferred_to_be_locked_.size() > 0) {
+    DCHECK(RuntimeEnabledFeatures::DeferredShapingEnabled());
+    for (auto& element : deferred_to_be_locked_) {
+      DCHECK(element->GetLayoutObject()->IsShapingDeferred());
+      auto& context = element->EnsureDisplayLockContext();
+      context.SetRequestedState(EContentVisibility::kAuto);
+    }
+    DEFERRED_SHAPING_VLOG(1)
+        << "Deferred " << deferred_to_be_locked_.size() << " elements";
+    deferred_to_be_locked_.resize(0);
+    UseCounter::Count(document, WebFeature::kDeferredShapingWorked);
+  }
 }
 
 float LocalFrameView::InputEventsScaleFactor() const {
@@ -2930,7 +2959,8 @@ void LocalFrameView::RunPaintLifecyclePhase(PaintBenchmarkMode benchmark_mode) {
     if (paint_artifact_compositor_ &&
         benchmark_mode ==
             PaintBenchmarkMode::kForcePaintArtifactCompositorUpdate) {
-      paint_artifact_compositor_->SetNeedsUpdate();
+      paint_artifact_compositor_->SetNeedsUpdate(
+          PaintArtifactCompositorUpdateReason::kLocalFrameViewBenchmarking);
     }
     needed_full_update = !paint_artifact_compositor_ ||
                          paint_artifact_compositor_->NeedsUpdate() ==
@@ -2997,6 +3027,9 @@ void LocalFrameView::RunAccessibilitySteps() {
   TRACE_EVENT0("blink,benchmark", "LocalFrameView::RunAccessibilitySteps");
 
   SCOPED_UMA_AND_UKM_TIMER(GetUkmAggregator(),
+                           LocalFrameUkmAggregator::kAccessibility);
+
+  SCOPED_UMA_AND_UKM_TIMER(EnsureUkmAggregator(),
                            LocalFrameUkmAggregator::kAccessibility);
 
   // Reduce redundant ancestor chain walking for display lock computations.
@@ -4776,10 +4809,11 @@ bool LocalFrameView::VisualViewportOrOverlayNeedsRepaintForTesting() const {
   return visual_viewport_or_overlay_needs_repaint_;
 }
 
-void LocalFrameView::SetPaintArtifactCompositorNeedsUpdate() {
+void LocalFrameView::SetPaintArtifactCompositorNeedsUpdate(
+    PaintArtifactCompositorUpdateReason reason) {
   LocalFrameView* root = GetFrame().LocalFrameRoot().View();
   if (root && root->paint_artifact_compositor_)
-    root->paint_artifact_compositor_->SetNeedsUpdate();
+    root->paint_artifact_compositor_->SetNeedsUpdate(reason);
 }
 
 PaintArtifactCompositor* LocalFrameView::GetPaintArtifactCompositor() const {

@@ -136,6 +136,9 @@ StyleResolverState::StyleResolverState(
   }
 
   DCHECK(document.IsActive());
+
+  if (UsesHighlightPseudoInheritance())
+    DCHECK(originating_element_style_);
 }
 
 StyleResolverState::~StyleResolverState() {
@@ -212,6 +215,15 @@ void StyleResolverState::UpdateLengthConversionData() const {
     should_update_line_height_ = false;
   }
   css_to_length_conversion_data_dirty_ = false;
+  element_style_resources_.UpdateLengthConversionData(
+      &css_to_length_conversion_data_);
+}
+
+void StyleResolverState::UpdateLengthConversionData() {
+  css_to_length_conversion_data_ = CSSToLengthConversionData(
+      Style(), RootElementStyle(), GetDocument().GetLayoutView(),
+      CSSToLengthConversionData::ContainerSizes(container_unit_context_),
+      Style()->EffectiveZoom());
   element_style_resources_.UpdateLengthConversionData(
       &css_to_length_conversion_data_);
 }
@@ -454,6 +466,11 @@ Element* StyleResolverState::GetAnimatingElement() const {
 
 PseudoElement* StyleResolverState::GetPseudoElement() const {
   return DynamicTo<PseudoElement>(styled_element_);
+}
+
+PseudoElement* StyleResolverState::GetPseudoElement() const {
+  return element_type_ == ElementType::kPseudoElement ? pseudo_element_
+                                                      : nullptr;
 }
 
 const CSSValue& StyleResolverState::ResolveLightDarkPair(

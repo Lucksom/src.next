@@ -1195,6 +1195,8 @@ class AutocompleteMediator
                     },
                     OMNIBOX_SUGGESTION_START_DELAY_MS);
         }
+
+        mListPropertyModel.set(SuggestionListProperties.LIST_IS_FINAL, isFinal);
     }
 
     @Override

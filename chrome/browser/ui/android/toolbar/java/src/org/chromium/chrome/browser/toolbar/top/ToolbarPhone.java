@@ -12,6 +12,7 @@ import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
@@ -2055,6 +2056,17 @@ public class ToolbarPhone extends ToolbarLayout
                 urlBar.getWidth());
     }
 
+    private ToolbarSnapshotState generateToolbarSnapshotState() {
+        return new ToolbarSnapshotState(getTint().getDefaultColor(),
+                mTabCountProvider.getTabCount(), mButtonData, mVisualState,
+                getToolbarDataProvider().getCurrentUrl(),
+                getToolbarDataProvider().getSecurityIconResource(false),
+                ImageViewCompat.getImageTintList(mHomeButton),
+                getMenuButtonCoordinator().isShowingUpdateBadge(),
+                getToolbarDataProvider().isPaintPreview(), getProgressBar().getProgress(),
+                mUnfocusedLocationBarLayoutWidth);
+    }
+
     @Override
     public void setLayoutUpdater(Runnable layoutUpdater) {
         mLayoutUpdater = layoutUpdater;
@@ -3264,6 +3276,12 @@ public class ToolbarPhone extends ToolbarLayout
             mHomeButton.setAccessibilityTraversalBefore(View.NO_ID);
         }
 
+        if (newVisualState == VisualState.NEW_TAB_NORMAL && mHomeButton != null) {
+            mHomeButton.setAccessibilityTraversalBefore(R.id.toolbar_buttons);
+        } else {
+            mHomeButton.setAccessibilityTraversalBefore(View.NO_ID);
+        }
+
         // If we are navigating to or from a brand color, allow the transition animation
         // to run to completion as it will handle the triggering this path again and committing
         // the proper visual state when it finishes.  Brand color transitions are only valid
@@ -3816,5 +3834,12 @@ public class ToolbarPhone extends ToolbarLayout
 
     private boolean inOrEnteringTabSwitcher() {
         return mTabSwitcherState == TAB_SWITCHER || mTabSwitcherState == ENTERING_TAB_SWITCHER;
+    }
+
+    @Override
+    @VisibleForTesting
+    public boolean isAnimationRunningForTesting() {
+        return mUrlFocusChangeInProgress || mBrandColorTransitionActive
+                || mOptionalButtonAnimationRunning;
     }
 }

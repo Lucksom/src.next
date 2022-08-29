@@ -471,6 +471,9 @@ void URLRequestHttpJob::Start() {
       MutableNetworkTrafficAnnotationTag(request_->traffic_annotation());
   request_info_.socket_tag = request_->socket_tag();
   request_info_.idempotency = request_->GetIdempotency();
+  request_info_.pervasive_payloads_index_for_logging =
+      request_->pervasive_payloads_index_for_logging();
+  request_info_.checksum = request_->expected_response_checksum();
 #if BUILDFLAG(ENABLE_REPORTING)
   request_info_.reporting_upload_depth = request_->reporting_upload_depth();
 #endif
@@ -499,6 +502,29 @@ void URLRequestHttpJob::Start() {
             base::OptionalToPtr(request_info_.fps_cache_filter));
       });
 
+  bool should_add_cookie_header = ShouldAddCookieHeader();
+  UMA_HISTOGRAM_BOOLEAN("Net.HttpJob.CanIncludeCookies",
+                        should_add_cookie_header);
+
+  if (!should_add_cookie_header) {
+    OnGotFirstPartySetMetadata(FirstPartySetMetadata());
+    return;
+  }
+  absl::optional<FirstPartySetMetadata> metadata =
+      cookie_util::ComputeFirstPartySetMetadataMaybeAsync(
+          SchemefulSite(request()->url()), request()->isolation_info(),
+          request()->context()->cookie_store()->cookie_access_delegate(),
+          request()->force_ignore_top_frame_party_for_cookies(),
+          base::BindOnce(&URLRequestHttpJob::OnGotFirstPartySetMetadata,
+                         weak_factory_.GetWeakPtr()));
+
+  if (metadata.has_value())
+    OnGotFirstPartySetMetadata(std::move(metadata.value()));
+}
+
+void URLRequestHttpJob::OnGotFirstPartySetMetadata(
+    FirstPartySetMetadata first_party_set_metadata) {
+  first_party_set_metadata_ = std::move(first_party_set_metadata);
   // Privacy mode could still be disabled in SetCookieHeaderAndStart if we are
   // going to send previously saved cookies.
   request_info_.privacy_mode = DeterminePrivacyMode();
@@ -831,6 +857,19 @@ void URLRequestHttpJob::AddCookieHeaderAndStart() {
       base::BindOnce(&URLRequestHttpJob::SetCookieHeaderAndStart,
                      weak_factory_.GetWeakPtr(), options));
 }
+
+namespace {
+
+bool ShouldBlockAllCookies(const PrivacyMode& privacy_mode) {
+  return privacy_mode == PRIVACY_MODE_ENABLED ||
+         privacy_mode == PRIVACY_MODE_ENABLED_WITHOUT_CLIENT_CERTS;
+}
+
+bool ShouldBlockUnpartitionedCookiesOnly(const PrivacyMode& privacy_mode) {
+  return privacy_mode == PRIVACY_MODE_ENABLED_PARTITIONED_STATE_ALLOWED;
+}
+
+}  // namespace
 
 void URLRequestHttpJob::SetCookieHeaderAndStart(
     const CookieOptions& options,
@@ -2134,6 +2173,19 @@ bool URLRequestHttpJob::ShouldAddCookieHeader() const {
 
 bool URLRequestHttpJob::ShouldRecordPartitionedCookieUsage() const {
   return request_->cookie_partition_key().has_value();
+}
+
+bool URLRequestHttpJob::ShouldAddCookieHeader() const {
+  // Read cookies whenever allow_credentials() is true, even if the PrivacyMode
+  // is being overridden by NetworkDelegate and will eventually block them, as
+  // blocked cookies still need to be logged in that case.
+  return request_->context()->cookie_store() && request_->allow_credentials();
+}
+
+bool URLRequestHttpJob::IsPartitionedCookiesEnabled() const {
+  // Only valid to call this after we've computed the key.
+  DCHECK(cookie_partition_key_.has_value());
+  return cookie_partition_key_.value().has_value();
 }
 
 }  // namespace net

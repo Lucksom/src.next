@@ -61,6 +61,10 @@ public class TopToolbarSceneLayer extends SceneOverlayLayer {
                         model.get(TopToolbarOverlayProperties.ANONYMIZE),
                         model.get(TopToolbarOverlayProperties.TOOLBAR_OFFSET_TAG));
 
+        if (ChromeFeatureList.isEnabled(ChromeFeatureList.DISABLE_COMPOSITED_PROGRESS_BAR)) {
+            return;
+        }
+
         DrawingInfo progressInfo = model.get(TopToolbarOverlayProperties.PROGRESS_BAR_INFO);
         if (progressInfo == null) return;
 

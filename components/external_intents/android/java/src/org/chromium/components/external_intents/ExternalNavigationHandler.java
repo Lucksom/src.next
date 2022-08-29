@@ -79,6 +79,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -2009,6 +2010,7 @@ public class ExternalNavigationHandler implements ExternalNavigationHelper {
             return OverrideUrlLoadingResult.forExternalIntent();
         }
 
+        ResolveActivitySupplier resolveActivity = new ResolveActivitySupplier(targetIntent);
         boolean requiresIntentChooser = false;
         if (navigationChainResult == NavigationChainResult.FOR_TRUSTED_CALLER) {
             mDelegate.setPackageForTrustedCallingApp(targetIntent);
@@ -2778,6 +2780,82 @@ public class ExternalNavigationHandler implements ExternalNavigationHelper {
         return Pair.create(icon, label);
     }
 
+    private OverrideUrlLoadingResult maybeAskToLaunchApp(boolean isExternalProtocol,
+            Intent targetIntent, QueryIntentActivitiesSupplier resolvingInfos,
+            ResolveActivitySupplier resolveActivity, GURL browserFallbackUrl) {
+        // For URLs the browser supports, we shouldn't have reached here.
+        assert isExternalProtocol;
+
+        // Use the fallback URL if we have it, otherwise we give sites a fingerprinting mechanism
+        // where they can repeatedly attempt to launch apps without a user gesture until they find
+        // one the user has installed.
+        if (!browserFallbackUrl.isEmpty()) return OverrideUrlLoadingResult.forNoOverride();
+
+        ResolveInfo intentResolveInfo = resolveActivity.get();
+
+        // No app can resolve the intent, don't prompt.
+        if (intentResolveInfo == null || intentResolveInfo.activityInfo == null) {
+            return OverrideUrlLoadingResult.forNoOverride();
+        }
+
+        // If the |resolvingInfos| from queryIntentActivities don't contain the result of
+        // resolveActivity, it means there's no default handler for the intent and it's resolving to
+        // the ResolverActivity. This means we can't know which app will be launched and can't
+        // convey that to the user. We also don't want to just allow the chooser dialog to be shown
+        // when the external navigation was otherwise blocked. In this case, we should just continue
+        // to block the navigation, and sites hoping to prompt the user when navigation fails should
+        // make sure to correctly target their app.
+        if (!resolversSubsetOf(Arrays.asList(intentResolveInfo), resolvingInfos.get())) {
+            return OverrideUrlLoadingResult.forNoOverride();
+        }
+
+        MessageDispatcher messageDispatcher =
+                MessageDispatcherProvider.from(mDelegate.getWindowAndroid());
+        WebContents webContents = mDelegate.getWebContents();
+        if (messageDispatcher == null || webContents == null) {
+            return OverrideUrlLoadingResult.forNoOverride();
+        }
+
+        String packageName = intentResolveInfo.activityInfo.packageName;
+        PackageManager pm = mDelegate.getContext().getPackageManager();
+        ApplicationInfo applicationInfo = null;
+        try {
+            applicationInfo = pm.getApplicationInfo(packageName, 0);
+        } catch (NameNotFoundException e) {
+            return OverrideUrlLoadingResult.forNoOverride();
+        }
+
+        Drawable icon = pm.getApplicationLogo(applicationInfo);
+        if (icon == null) icon = pm.getApplicationIcon(applicationInfo);
+        CharSequence label = pm.getApplicationLabel(applicationInfo);
+
+        Resources res = mDelegate.getContext().getResources();
+        String title = res.getString(R.string.external_navigation_continue_to_title, label);
+        String description =
+                res.getString(R.string.external_navigation_continue_to_description, label);
+        String action = res.getString(R.string.external_navigation_continue_to_action);
+
+        PropertyModel message =
+                new PropertyModel.Builder(MessageBannerProperties.ALL_KEYS)
+                        .with(MessageBannerProperties.MESSAGE_IDENTIFIER,
+                                MessageIdentifier.EXTERNAL_NAVIGATION)
+                        .with(MessageBannerProperties.TITLE, title)
+                        .with(MessageBannerProperties.DESCRIPTION, description)
+                        .with(MessageBannerProperties.ICON, icon)
+                        .with(MessageBannerProperties.PRIMARY_BUTTON_TEXT, action)
+                        .with(MessageBannerProperties.ICON_TINT_COLOR,
+                                MessageBannerProperties.TINT_NONE)
+                        .with(MessageBannerProperties.ON_PRIMARY_ACTION,
+                                () -> {
+                                    startActivity(targetIntent, false);
+                                    return PrimaryActionClickBehavior.DISMISS_IMMEDIATELY;
+                                })
+                        .build();
+        messageDispatcher.enqueueMessage(message, webContents, MessageScopeType.NAVIGATION, false);
+        return OverrideUrlLoadingResult.forAsyncAction(
+                OverrideUrlLoadingAsyncActionType.UI_GATING_INTENT_LAUNCH);
+    }
+
     /**
      * Returns the number of specialized intent handlers in {@params infos}. Specialized intent
      * handlers are intent handlers which handle only a few URLs (e.g. google maps or youtube).
@@ -3020,5 +3098,32 @@ public class ExternalNavigationHandler implements ExternalNavigationHelper {
             scheme = scheme.replaceAll("[^a-z0-9.+-]", "");
         }
         return scheme;
+    }
+
+    /**
+     * @return whether this navigation is a redirect from an intent.
+     */
+    private static boolean isIncomingIntentRedirect(ExternalNavigationParams params) {
+        boolean isOnEffectiveIntentRedirect = params.getRedirectHandler() == null
+                ? false
+                : params.getRedirectHandler().isOnNoninitialLoadForIntentNavigationChain();
+        return (params.isFromIntent() && params.isRedirect()) || isOnEffectiveIntentRedirect;
+    }
+
+    /**
+     * Checks whether {@param intent} is for an Instant App. Considers both package and actions that
+     * would resolve to Supervisor.
+     * @return Whether the given intent is going to open an Instant App.
+     */
+    private static boolean isIntentToInstantApp(Intent intent) {
+        if (INSTANT_APP_SUPERVISOR_PKG.equals(intent.getPackage())) return true;
+
+        String intentAction = intent.getAction();
+        for (String action : INSTANT_APP_START_ACTIONS) {
+            if (action.equals(intentAction)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

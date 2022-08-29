@@ -26,6 +26,8 @@
 #include "extensions/common/extension_features.h"
 #include "extensions/common/manifest.h"
 #include "extensions/strings/grit/extensions_strings.h"
+#include "services/data_decoder/public/cpp/data_decoder.h"
+#include "services/data_decoder/public/mojom/json_parser.mojom.h"
 #include "ui/base/l10n/l10n_util.h"
 
 namespace extensions {

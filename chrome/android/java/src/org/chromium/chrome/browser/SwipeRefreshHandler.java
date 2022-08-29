@@ -265,7 +265,8 @@ public class SwipeRefreshHandler extends TabWebContentsUserData
             if (mSwipeRefreshLayout == null) initSwipeRefreshLayout(mTab.getContext());
             assumeNonNull(mSwipeRefreshLayout);
             attachSwipeRefreshLayoutIfNecessary();
-            return mSwipeRefreshLayout.start();
+            return mSwipeRefreshLayout.start(ChromeFeatureList.isEnabled(
+                    ChromeFeatureList.OPTIMIZE_LAYOUTS_FOR_PULL_REFRESH));
         } else if (type == OverscrollAction.HISTORY_NAVIGATION) {
             if (mNavigationCoordinator != null) {
                 mNavigationCoordinator.startGesture();

@@ -170,6 +170,8 @@ public class TopToolbarCoordinator implements Toolbar, TopControlLayer {
      * Creates a new {@link TopToolbarCoordinator}.
      *
      * @param controlContainer The {@link ToolbarControlContainer} for the containing activity.
+     * @param toolbarStub The stub for the tab switcher mode toolbar.
+     * @param fullscreenToolbarStub The stub for the fullscreen tab switcher mode toolbar.
      * @param toolbarLayout The {@link ToolbarLayout}.
      * @param toolbarDataProvider The provider for toolbar data.
      * @param tabController The controller that handles interactions with the tab.
@@ -389,6 +391,20 @@ public class TopToolbarCoordinator implements Toolbar, TopControlLayer {
     }
 
     /**
+     * Set fullscreen GTS toolbar stub
+     * @param toolbarStub stub to set.
+     */
+    public void setFullScreenToolbarStub(ViewStub toolbarStub) {
+        if (mTabSwitcherModeCoordinator != null) {
+            mTabSwitcherModeCoordinator.setFullScreenToolbarStub(toolbarStub);
+        }
+    }
+
+    private boolean isTabletGridTabSwitcherEnabled() {
+        return ChromeFeatureList.sGridTabSwitcherForTablets.isEnabled();
+    }
+
+    /**
      * @param appMenuButtonHelper The helper for managing menu button interactions.
      */
     public void setAppMenuButtonHelper(AppMenuButtonHelper appMenuButtonHelper) {
@@ -404,6 +420,7 @@ public class TopToolbarCoordinator implements Toolbar, TopControlLayer {
      * @param layoutUpdater A {@link Runnable} used to request layout update upon scene change.
      * @param bookmarkClickHandler The click handler for the bookmarks button.
      * @param customTabsBackClickHandler The click handler for the custom tabs back button.
+     * @param appMenuDelegate Allows interacting with the app menu.
      * @param layoutManager A {@link LayoutManager} used to watch for scene changes.
      * @param tabSupplier Supplier of the activity tab.
      * @param browserControlsVisibilityManager {@link BrowserControlsVisibilityManager} to access
@@ -859,6 +876,9 @@ public class TopToolbarCoordinator implements Toolbar, TopControlLayer {
      */
     public void onDefaultSearchEngineChanged() {
         mToolbarLayout.onDefaultSearchEngineChanged();
+        if (mStartSurfaceToolbarCoordinator != null) {
+            mStartSurfaceToolbarCoordinator.onDefaultSearchEngineChanged();
+        }
     }
 
     @Override
@@ -931,6 +951,16 @@ public class TopToolbarCoordinator implements Toolbar, TopControlLayer {
     /** Gets the id of a view after which the toolbar is visited in accessibility traversal. */
     public int getAccessibilityTraversalAfter() {
         return mToolbarLayout.getAccessibilityTraversalAfter();
+    }
+
+    /**
+     * @return A {@link TopToolbarInteractabilityManager} which allows non toolbar clients to toggle
+     *         the interactability of elements present in the top toolbar.
+     */
+    public @NonNull TopToolbarInteractabilityManager getTopToolbarInteractabilityManager() {
+        return mStartSurfaceToolbarCoordinator != null
+                ? mStartSurfaceToolbarCoordinator.getTopToolbarInteractabilityManager()
+                : mTabSwitcherModeCoordinator.getTopToolbarInteractabilityManager();
     }
 
     /** Returns the {@link OptionalBrowsingModeButtonController}. */

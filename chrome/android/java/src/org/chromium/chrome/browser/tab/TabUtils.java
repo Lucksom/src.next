@@ -46,6 +46,21 @@ import org.chromium.ui.display.DisplayUtil;
 public class TabUtils {
     @VisibleForTesting public static final float PORTRAIT_THUMBNAIL_ASPECT_RATIO = 0.85f;
 
+    /**
+     * Define the callers of NavigationControllerImpl#setUseDesktopUserAgent.
+     */
+    @IntDef({UseDesktopUserAgentCaller.ON_MENU_OR_KEYBOARD_ACTION,
+            UseDesktopUserAgentCaller.LOAD_IF_NEEDED, UseDesktopUserAgentCaller.RELOAD,
+            UseDesktopUserAgentCaller.RELOAD_IGNORING_CACHE, UseDesktopUserAgentCaller.OTHER})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface UseDesktopUserAgentCaller {
+        int ON_MENU_OR_KEYBOARD_ACTION = 0;
+        int LOAD_IF_NEEDED = 1;
+        int RELOAD = 2;
+        int RELOAD_IGNORING_CACHE = 3;
+        int OTHER = 4;
+    }
+
     // Do not instantiate this class.
     private TabUtils() {}
 
@@ -349,6 +364,64 @@ public class TabUtils {
         final int tabGridCardMargin = (int) TabUiThemeProvider.getTabGridCardMargin(context);
         final int thumbnailMargin =
                 (int) context.getResources().getDimension(R.dimen.tab_grid_card_thumbnail_margin);
+        return 2 * (tabGridCardMargin + thumbnailMargin);
+    }
+
+    /**
+     * Return aspect ratio for grid tab card based on form factor and orientation.
+     * @param context - Context of the application.
+     * @return Aspect ratio for the grid tab card.
+     */
+    public static float getTabThumbnailAspectRatio(Context context) {
+        if (TabUiFeatureUtilities.isTabletGridTabSwitcherPolishEnabled(context)
+                && context.getResources().getConfiguration().orientation
+                        == Configuration.ORIENTATION_LANDSCAPE) {
+            return (context.getResources().getConfiguration().screenWidthDp * 1.f)
+                    / (context.getResources().getConfiguration().screenHeightDp * 1.f);
+        }
+        float value = (float) TabUiFeatureUtilities.THUMBNAIL_ASPECT_RATIO.getValue();
+        return MathUtils.clamp(value, 0.5f, 2.0f);
+    }
+
+    /**
+     * Derive grid card height based on width, expected thumbnail aspect ratio and margins.
+     * @param cardWidthPx width of the card
+     * @param context to derive view margins
+     * @return computed card height.
+     */
+    public static int deriveGridCardHeight(int cardWidthPx, Context context) {
+        int tabThumbnailHeight = (int) ((cardWidthPx - getThumbnailWidthDiff(context))
+                / getTabThumbnailAspectRatio(context));
+        int cardHeightPx = tabThumbnailHeight + getThumbnailHeightDiff(context);
+        return cardHeightPx;
+    }
+
+    /**
+     * Derive thumbnail size based on parent card size.
+     * @param gridCardSize size of parent card.
+     * @param context to derive view margins.
+     * @return computed width and height of thumbnail.
+     */
+    public static Size deriveThumbnailSize(@NonNull Size gridCardSize, @NonNull Context context) {
+        int thumbnailWidth = gridCardSize.getWidth() - getThumbnailWidthDiff(context);
+        int thumbnailHeight = gridCardSize.getHeight() - getThumbnailHeightDiff(context);
+        return new Size(thumbnailWidth, thumbnailHeight);
+    }
+
+    private static int getThumbnailHeightDiff(Context context) {
+        final int tabGridCardMargin = (int) TabUiThemeProvider.getTabGridCardMargin(context);
+        final int thumbnailMargin = (int) context.getResources().getDimension(
+                org.chromium.chrome.tab_ui.R.dimen.tab_grid_card_thumbnail_margin);
+        int heightMargins = (2 * tabGridCardMargin) + thumbnailMargin;
+        final int titleHeight = (int) context.getResources().getDimension(
+                org.chromium.chrome.tab_ui.R.dimen.tab_grid_card_header_height);
+        return titleHeight + heightMargins;
+    }
+
+    private static int getThumbnailWidthDiff(Context context) {
+        final int tabGridCardMargin = (int) TabUiThemeProvider.getTabGridCardMargin(context);
+        final int thumbnailMargin = (int) context.getResources().getDimension(
+                org.chromium.chrome.tab_ui.R.dimen.tab_grid_card_thumbnail_margin);
         return 2 * (tabGridCardMargin + thumbnailMargin);
     }
 }

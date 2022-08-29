@@ -140,7 +140,7 @@ std::string GetVariationDirectory() {
                                        "directory");
 }
 
-PopularSites::SitesVector ParseSiteList(const base::ListValue& list) {
+PopularSites::SitesVector ParseSiteList(const base::Value::List& list) {
   PopularSites::SitesVector sites;
   for (const base::Value& item_value : list) {
     if (!item_value.is_dict()) {
@@ -237,7 +237,7 @@ std::map<SectionType, PopularSites::SitesVector> ParseSectioned(
 }
 
 std::map<SectionType, PopularSites::SitesVector> ParseSites(
-    const base::ListValue& list,
+    const base::Value::List& list,
     int version) {
   if (version < kSitesExplorationStartVersion) {
     return ParseSimple(list);

@@ -41,6 +41,9 @@ found in the LICENSE file.
     <!-- Home Button Menu dimensions-->
     <dimen name="home_button_list_menu_width">222dp</dimen>
 
+    <!-- Home Button Menu dimensions-->
+    <dimen name="home_button_list_menu_width">222dp</dimen>
+
     <dimen name="menu_badge_translation_y">6dp</dimen>
 
     <!-- Tab group UI dimensions -->

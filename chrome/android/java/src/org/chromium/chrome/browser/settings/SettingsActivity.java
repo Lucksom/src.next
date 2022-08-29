@@ -221,6 +221,9 @@ public class SettingsActivity extends ChromeBaseAppCompatActivity
 
     private @Nullable List<SettingsIndexData.Entry> mInitialBreadcrumbPath;
 
+    @Nullable
+    private UiConfig mUiConfig;
+
     @SuppressLint("InlinedApi")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -821,6 +824,12 @@ public class SettingsActivity extends ChromeBaseAppCompatActivity
             GlicHelper.maybeShowGlicTaskInProgressSnackbar(
                     this, mProfile, this, GlicHelper.Caller.SETTINGS_ACTIVITY);
         }
+        if (fragment instanceof AdPersonalizationFragment) {
+            ((AdPersonalizationFragment) fragment).setSnackbarManager(getSnackbarManager());
+        }
+        if (fragment instanceof AdPersonalizationRemovedFragment) {
+            ((AdPersonalizationRemovedFragment) fragment).setSnackbarManager(getSnackbarManager());
+        }
     }
 
     @Override
@@ -1124,6 +1133,14 @@ public class SettingsActivity extends ChromeBaseAppCompatActivity
                             getOnBackPressedDispatcher(),
                             (BackPressHandler) activeFragment);
         }
+        if (fragment instanceof PrivacySettings) {
+            ((PrivacySettings) fragment).setBottomSheetController(mBottomSheetController);
+            ((PrivacySettings) fragment).setDialogContainer(findViewById(R.id.dialog_container));
+        }
+        if (fragment instanceof AccessibilitySettings) {
+            ((AccessibilitySettings) fragment)
+                    .setDelegate(new ChromeAccessibilitySettingsDelegate());
+        }
     }
 
     private void registerBottomSheetBackPressHandler() {
@@ -1378,5 +1395,10 @@ public class SettingsActivity extends ChromeBaseAppCompatActivity
 
     public @Nullable SettingsSearchCoordinator getSearchCoordinatorForTesting() {
         return mSearchCoordinator;
+    }
+
+    @Override
+    protected ModalDialogManager createModalDialogManager() {
+        return new ModalDialogManager(new AppModalPresenter(this), ModalDialogType.APP);
     }
 }

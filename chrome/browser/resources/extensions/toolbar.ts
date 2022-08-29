@@ -249,4 +249,10 @@ declare global {
   }
 }
 
+declare global {
+  interface HTMLElementTagNameMap {
+    'extensions-toolbar': ExtensionsToolbarElement;
+  }
+}
+
 customElements.define(ExtensionsToolbarElement.is, ExtensionsToolbarElement);
