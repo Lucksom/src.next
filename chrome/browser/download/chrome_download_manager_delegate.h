@@ -104,7 +104,8 @@ class ChromeDownloadManagerDelegate
                           int64_t total_bytes,
                           DownloadLocationDialogType dialog_type,
                           const base::FilePath& suggested_path,
-                          DownloadDialogBridge::DialogCallback callback);
+                          DownloadDialogBridge::DialogCallback callback,
+                          download::DownloadItem* download);
 
   void SetDownloadDialogBridgeForTesting(DownloadDialogBridge* bridge);
   void SetDownloadMessageBridgeForTesting(DownloadMessageBridge* bridge);

@@ -87,6 +87,17 @@ sk_sp<cc::ColorFilter> GetDarkModeFilterForImageOnMainThread(
   return color_filter;
 }
 
+// TODO(gilmanmh): If grayscaling images in dark mode proves popular among
+// users, consider experimenting with different grayscale algorithms.
+sk_sp<SkColorFilter> MakeGrayscaleFilter(float grayscale_percent) {
+  DCHECK_GE(grayscale_percent, 0.0f);
+  DCHECK_LE(grayscale_percent, 1.0f);
+
+  SkColorMatrix grayscale_matrix;
+  grayscale_matrix.setSaturation(1.0f - grayscale_percent);
+  return SkColorFilters::Matrix(grayscale_matrix);
+}
+
 }  // namespace
 
 // DarkModeInvertedColorCache - Implements cache for inverted colors.

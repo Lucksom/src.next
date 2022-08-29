@@ -143,6 +143,7 @@ import org.chromium.ui.modelutil.PropertyModel;
 import org.chromium.ui.modelutil.PropertyModel.WritableObjectPropertyKey;
 import org.chromium.ui.recyclerview.widget.ItemTouchHelper2;
 import org.chromium.url.GURL;
+import org.chromium.base.ContextUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

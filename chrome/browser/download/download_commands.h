@@ -11,7 +11,7 @@
 #include "build/build_config.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID) || true
 class Browser;
 #endif
 

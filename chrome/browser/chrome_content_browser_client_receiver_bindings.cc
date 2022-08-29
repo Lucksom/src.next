@@ -106,9 +106,14 @@
 #include "components/pdf/browser/pdf_document_helper.h"
 #endif
 
+#include "chrome/browser/ui/search/search_tab_helper.h"
+
 #if BUILDFLAG(ENABLE_PRINTING)
 #include "chrome/browser/printing/print_view_manager_basic.h"
 #include "components/printing/browser/headless/headless_print_manager.h"
+#if 0
+#include "components/printing/browser/print_to_pdf/pdf_print_manager.h"
+#endif
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
 #include "chrome/browser/printing/print_view_manager.h"
 #endif  // BUILDFLAG(ENABLE_PRINT_PREVIEW)

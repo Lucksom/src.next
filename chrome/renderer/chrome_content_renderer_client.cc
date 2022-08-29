@@ -266,6 +266,9 @@
 #include "chrome/renderer/media/chrome_key_systems.h"
 #endif
 
+#include "chrome/renderer/searchbox/searchbox.h"
+#include "chrome/renderer/searchbox/searchbox_extension.h"
+
 using autofill::AutofillAgent;
 using autofill::PasswordAutofillAgent;
 using autofill::PasswordGenerationAgent;
@@ -1262,7 +1265,7 @@ void ChromeContentRendererClient::WillSendRequest(
     return;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID) || true
   SearchBox* search_box =
       SearchBox::Get(content::RenderFrame::FromWebFrame(frame->LocalRoot()));
   if (search_box) {

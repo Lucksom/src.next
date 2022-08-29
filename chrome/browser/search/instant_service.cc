@@ -90,7 +90,7 @@ InstantService::InstantService(Profile* profile)
   content::URLDataSource::Add(profile_,
                               std::make_unique<MostVisitedIframeSource>());
   content::URLDataSource::Add(profile_,
-                              std::make_unique<NewTabPageSource>());
+                              std::make_unique<NewTabPageSource>(profile_));
 
   theme_observation_.Observe(ui::NativeTheme::GetInstanceForNativeUi());
 }

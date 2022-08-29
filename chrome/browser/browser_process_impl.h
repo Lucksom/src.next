@@ -37,7 +37,7 @@
 #include "services/network/public/cpp/network_quality_tracker.h"
 #include "ui/base/unowned_user_data/unowned_user_data_host.h"
 
-#if !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID) || true
 #include "chrome/browser/upgrade_detector/build_state.h"
 #endif
 
@@ -383,7 +383,7 @@ class BrowserProcessImpl : public BrowserProcess,
   std::unique_ptr<NotificationUIManager> notification_ui_manager_;
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID) || true
   std::unique_ptr<IntranetRedirectDetector> intranet_redirect_detector_;
 #endif
 

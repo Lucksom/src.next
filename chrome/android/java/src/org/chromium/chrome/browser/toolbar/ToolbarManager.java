@@ -281,6 +281,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.chromium.chrome.browser.toolbar.top.TabSwitcherActionMenuCoordinator;
+import android.view.View.OnLongClickListener;
+import org.chromium.base.ContextUtils;
+
 /**
  * Contains logic for managing the toolbar visual component. This class manages the interactions
  * with the rest of the application to ensure the toolbar is always visually up to date.

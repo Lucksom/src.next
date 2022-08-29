@@ -222,6 +222,7 @@ void ShowReauthForAccount(Profile* profile,
       /*enable_sync=*/false, access_point,
       signin_metrics::PromoAction::PROMO_ACTION_NO_SIGNIN_PROMO);
 #endif
+#endif
 }
 
 void SignInFromSingleAccountPromo(Profile* profile,

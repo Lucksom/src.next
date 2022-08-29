@@ -44,6 +44,9 @@ import org.chromium.ui.widget.RectProvider;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import org.chromium.base.ContextUtils;
+import android.view.View.OnClickListener;
+
 /**
  * The main coordinator for the Tab Switcher Action Menu, responsible for creating the popup menu
  * (popup window) in general and building a list of menu items.

@@ -11,6 +11,8 @@ if (use_blink) {
   import("//chrome/common/features.gni")
 }
 
+include_polymer = true
+
 generate_grd("build_grd") {
   grd_prefix = "webui"
   out_grd = "$target_gen_dir/${grd_prefix}_resources.grd"

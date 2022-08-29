@@ -205,6 +205,8 @@
 #include "url/gurl.h"
 #include "url/url_constants.h"
 
+#include "components/signin/public/base/signin_metrics.h"
+
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/ui/extensions/app_launch_params.h"
 #include "chrome/browser/ui/extensions/application_launch.h"
@@ -2193,6 +2195,7 @@ void SharingHub(BrowserWindowInterface* browser) {
       sharing_hub::SharingHubBubbleController::CreateOrGetFromWebContents(
           web_contents);
   controller->ShowBubble(share::ShareAttempt(web_contents));
+#endif
 }
 
 void ScreenshotCapture(BrowserWindowInterface* browser) {

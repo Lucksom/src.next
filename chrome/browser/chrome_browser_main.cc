@@ -352,6 +352,8 @@
 #include "components/component_updater/component_updater_service.h"
 #endif
 
+#include "chrome/browser/profiles/chrome_browser_main_extra_parts_profiles.h"
+
 namespace {
 
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || \
@@ -1663,6 +1665,8 @@ void ChromeBrowserMainParts::PostBrowserStart() {
 
   browser_process_->browser_policy_connector()->OnBrowserStarted();
 
+  ChromeBrowserMainExtraPartsProfiles::
+      EnsureBrowserContextKeyedServiceFactoriesBuilt(true);
 #if BUILDFLAG(ENABLE_PROCESS_SINGLETON)
   // Allow ProcessSingleton to process messages.
   // This is done here instead of just relying on the main message loop's start

@@ -54,8 +54,10 @@
 #include "ui/gfx/geometry/rect.h"
 #include "url/origin.h"
 
+#if 0
 #if BUILDFLAG(IS_ANDROID)
 #error This file should only be included on desktop.
+#endif
 #endif
 
 #if BUILDFLAG(IS_OZONE)

@@ -69,6 +69,7 @@ import org.chromium.components.browser_ui.util.FirstDrawDetector;
 import org.chromium.content_public.browser.UiThreadTaskTraits;
 import org.chromium.ui.modelutil.PropertyModel;
 
+import org.chromium.base.ContextUtils;
 import java.util.List;
 
 /**
@@ -274,6 +275,10 @@ class TabSwitcherMediator implements TabSwitcher.Controller, TabListRecyclerView
         mTabModelSelector = tabModelSelector;
         mBrowserControlsStateProvider = browserControlsStateProvider;
         mMultiWindowModeStateDispatcher = multiWindowModeStateDispatcher;
+        if (ContextUtils.getAppSharedPreferences().getString("active_tabswitcher", "default").equals("list"))
+          mode = TabListMode.LIST;
+        if (ContextUtils.getAppSharedPreferences().getString("active_tabswitcher", "default").equals("classic") || ContextUtils.getAppSharedPreferences().getString("active_tabswitcher", "default").equals("grid"))
+          mode = TabListMode.GRID;
         mMode = mode;
         mContext = context;
 
@@ -739,6 +744,8 @@ class TabSwitcherMediator implements TabSwitcher.Controller, TabListRecyclerView
     private void setInitialScrollIndexOffset() {
         int offset = mMode == TabListMode.CAROUSEL ? INITIAL_SCROLL_INDEX_OFFSET_CAROUSEL
                                                    : INITIAL_SCROLL_INDEX_OFFSET_GTS;
+        if (ContextUtils.getAppSharedPreferences().getString("active_tabswitcher", "default").equals("classic"))
+          offset = 0;
         int initialPosition = Math.max(
                 mTabModelSelector.getTabModelFilterProvider().getCurrentTabModelFilter().index()
                         - offset,

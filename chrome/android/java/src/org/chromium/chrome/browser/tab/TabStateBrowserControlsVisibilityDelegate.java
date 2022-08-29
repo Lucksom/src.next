@@ -315,6 +315,18 @@ public class TabStateBrowserControlsVisibilityDelegate extends BrowserControlsVi
             Log.i(TAG, "Browser controls hiding reason flags: " + Integer.toBinaryString(flags));
         }
 
+        String KeepToolbarSetting = ContextUtils.getAppSharedPreferences().getString("keep_toolbar_visible_configuration", "unknown");
+        if (KeepToolbarSetting.equals("unknown")) {
+          if (ChromeAccessibilityUtil.get().isAccessibilityEnabled())
+            enableHidingBrowserControls &= false;
+          else
+            enableHidingBrowserControls &= true;
+        } else if (KeepToolbarSetting.equals("on")) {
+            enableHidingBrowserControls &= false;
+        } else {
+            enableHidingBrowserControls &= true;
+        }
+
         return enableHidingBrowserControls;
     }
 

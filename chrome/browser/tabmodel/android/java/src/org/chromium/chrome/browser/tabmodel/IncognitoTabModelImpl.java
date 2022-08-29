@@ -287,6 +287,11 @@ class IncognitoTabModelImpl implements IncognitoTabModelInternal {
     }
 
     @Override
+    public int getLastNonExtensionActiveIndex() {
+        return mDelegateModel.getLastNonExtensionActiveIndex();
+    }
+
+    @Override
     public boolean isActiveModel() {
         return mActive;
     }

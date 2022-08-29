@@ -65,6 +65,7 @@ void OpenItem(Profile*,
       base::BindOnce(&VerifyAndOpenItemOnBlockingThread, full_path, item_type,
                      std::move(callback)));
 }
+#endif
 
 bool IsBrowserLockedFullscreen(const BrowserWindowInterface* browser) {
   return false;

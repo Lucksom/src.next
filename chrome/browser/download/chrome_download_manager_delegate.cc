@@ -673,7 +673,8 @@ void ChromeDownloadManagerDelegate::ShowDownloadDialog(
     int64_t total_bytes,
     DownloadLocationDialogType dialog_type,
     const base::FilePath& suggested_path,
-    DownloadDialogBridge::DialogCallback callback) {
+    DownloadDialogBridge::DialogCallback callback,
+    download::DownloadItem* download) {
   DCHECK(download_dialog_bridge_);
   auto connection_type = net::NetworkChangeNotifier::GetConnectionType();
 
@@ -1703,7 +1704,7 @@ void ChromeDownloadManagerDelegate::GenerateUniqueFileNameDone(
       ShowDownloadDialog(
           native_window, 0 /* total_bytes */,
           DownloadLocationDialogType::NAME_CONFLICT, target_path,
-          base::BindOnce(&OnDownloadDialogClosed, std::move(callback)));
+          base::BindOnce(&OnDownloadDialogClosed, std::move(callback)), last_download_item_);
       return;
     }
 

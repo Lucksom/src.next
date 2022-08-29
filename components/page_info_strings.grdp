@@ -204,7 +204,7 @@
     </if>
 
     <!-- Cookies -->
-    <if expr="not is_android">
+    <if expr="not is_android or is_android">
       <message name="IDS_PAGE_INFO_COOKIES" desc="The label for the Cookies setting in the Page Information Window.">
         Cookies
       </message>

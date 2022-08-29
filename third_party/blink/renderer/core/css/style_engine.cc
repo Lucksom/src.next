@@ -139,6 +139,8 @@
 #include "third_party/blink/renderer/platform/wtf/vector.h"
 #include "third_party/blink/renderer/platform/wtf/wtf_size_t.h"
 
+#include "third_party/blink/renderer/platform/graphics/dark_mode_settings_builder.h"
+
 namespace blink {
 
 namespace {
@@ -4677,6 +4679,10 @@ void StyleEngine::UpdateColorSchemeBackground(bool color_scheme_changed) {
         root_color_scheme = mojom::blink::ColorScheme::kDark;
       }
     }
+    auto* settings = GetDocument().GetSettings();
+    bool force_dark_enabled = settings && settings->GetForceDarkModeEnabled();
+    if (force_dark_enabled)
+      root_color_scheme = mojom::blink::ColorScheme::kDark;
     color_scheme_background_ =
         root_color_scheme == mojom::blink::ColorScheme::kLight
             ? Color::kWhite

@@ -178,6 +178,8 @@ void ChromeBrowserMainPartsPosix::ShowMissingLocaleMessageBox() {
   // for now, crash.
   NOTREACHED();
 #else
+#if 0
 #error "Need MessageBox implementation."
+#endif
 #endif
 }

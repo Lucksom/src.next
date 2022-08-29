@@ -23,6 +23,7 @@
 #include "chrome/browser/ui/translate/partial_translate_bubble_model.h"
 #include "chrome/browser/ui/webui/tab_search/tab_search.mojom.h"
 #include "chrome/common/buildflags.h"
+#include "components/strings/grit/components_strings.h"
 #include "components/content_settings/core/common/content_settings_types.h"
 #include "components/translate/core/browser/translate_step.h"
 #include "components/translate/core/common/translate_errors.h"
@@ -33,8 +34,10 @@
 #include "ui/gfx/native_ui_types.h"
 #include "url/origin.h"
 
+#if 0
 #if BUILDFLAG(IS_ANDROID)
 #error This file should only be included on desktop.
+#endif
 #endif
 
 class Browser;

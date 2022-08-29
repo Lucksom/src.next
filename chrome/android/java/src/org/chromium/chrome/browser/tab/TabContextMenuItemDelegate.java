@@ -504,7 +504,6 @@ public class TabContextMenuItemDelegate implements ContextMenuItemDelegate {
     public void onOpenInChrome(GURL linkUrl, GURL pageUrl) {
         Context applicationContext = ContextUtils.getApplicationContext();
         Intent chromeIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(linkUrl.getSpec()));
-        chromeIntent.setPackage(applicationContext.getPackageName());
         chromeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         if (!PackageManagerUtils.canResolveActivity(chromeIntent)) {

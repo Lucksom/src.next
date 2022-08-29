@@ -82,7 +82,7 @@
 #include "chrome/browser/ui/signin/signin_view_controller.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID) || true
 #include "base/metrics/histogram_functions.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/web_applications/web_app_utils.h"
@@ -337,6 +337,7 @@ void ShowHistory(BrowserWindowInterface* browser,
     BrowserWindow::FromBrowser(browser)->ShowIncognitoHistoryDisclaimerDialog();
     return;
   }
+#endif
 
   base::RecordAction(UserMetricsAction("ShowHistory"));
   GURL url = GURL(kChromeUIHistoryURL);

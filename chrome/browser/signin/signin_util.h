@@ -141,7 +141,7 @@ void ResetForceSigninForTesting();
 // Returns true if profile deletion is allowed.
 bool IsProfileDeletionAllowed(Profile* profile);
 
-#if !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID) || true
 #if !BUILDFLAG(IS_CHROMEOS)
 
 // Returns true if managed accounts signin are required to create a new profile

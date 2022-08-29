@@ -18,18 +18,11 @@ import org.chromium.ui.modelutil.PropertyModel.WritableObjectPropertyKey;
 /** Properties associated with the top toolbar's composited layer. */
 @NullMarked
 public class TopToolbarOverlayProperties {
-    /** Whether the URL should be hidden when rendered. */
-    public static final WritableBooleanPropertyKey ANONYMIZE = new WritableBooleanPropertyKey();
-
-    /** A "struct" for progress bar drawing info. */
-    public static final WritableObjectPropertyKey<DrawingInfo> PROGRESS_BAR_INFO =
-            new WritableObjectPropertyKey<>(true);
-
     /** The ID of the toolbar's texture resource. */
     public static final ReadableIntPropertyKey RESOURCE_ID = new ReadableIntPropertyKey();
 
-    /** Whether the shadow under the toolbar should be visible. */
-    public static final WritableBooleanPropertyKey SHOW_SHADOW = new WritableBooleanPropertyKey();
+    /** The texture resource used to draw the location/URL bar. */
+    public static final ReadableIntPropertyKey URL_BAR_RESOURCE_ID = new ReadableIntPropertyKey();
 
     /** The background color of the toolbar. */
     public static final WritableIntPropertyKey TOOLBAR_BACKGROUND_COLOR =
@@ -38,8 +31,11 @@ public class TopToolbarOverlayProperties {
     /** The color of the location/URL bar. */
     public static final WritableIntPropertyKey URL_BAR_COLOR = new WritableIntPropertyKey();
 
-    /** The texture resource used to draw the location/URL bar. */
-    public static final ReadableIntPropertyKey URL_BAR_RESOURCE_ID = new ReadableIntPropertyKey();
+    /** The current offset of the top toolbar. */
+    public static final WritableFloatPropertyKey Y_OFFSET = new WritableFloatPropertyKey();
+
+    /** Whether the shadow under the toolbar should be visible. */
+    public static final WritableBooleanPropertyKey SHOW_SHADOW = new WritableBooleanPropertyKey();
 
     /** Whether the layer should be visible. */
     public static final WritableBooleanPropertyKey VISIBLE = new WritableBooleanPropertyKey();

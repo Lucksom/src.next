@@ -388,7 +388,7 @@ void ChromeRenderFrameObserver::SetWindowFeatures(
 
 void ChromeRenderFrameObserver::ExecuteWebUIJavaScript(
     const std::u16string& javascript) {
-#if !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID) || true
   webui_javascript_.push_back(javascript);
 #endif
 }

@@ -228,7 +228,7 @@ class BrowserProcess {
   virtual supervised_user::DeviceParentalControls&
   device_parental_controls() = 0;
 
-#if !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID) || true
   virtual IntranetRedirectDetector* intranet_redirect_detector() = 0;
 #endif
 

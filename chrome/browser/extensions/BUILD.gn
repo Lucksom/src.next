@@ -439,6 +439,8 @@ source_set("extensions") {
     "sync/sync_bundle.cc",
     "sync/sync_bundle.h",
     "system_display/display_info_provider.h",
+    "system_display/display_info_provider_aura.cc",
+    "system_display/display_info_provider_aura.h",
     "tab_helper.cc",
     "tab_helper.h",
     "updater/authenticated_network_fetcher.cc",

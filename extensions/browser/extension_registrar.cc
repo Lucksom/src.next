@@ -46,8 +46,16 @@
 #include "extensions/common/switches.h"
 #include "third_party/blink/public/common/service_worker/service_worker_status_code.h"
 
+#include "chrome/browser/android/tab_android.h"
+#include "chrome/browser/ui/android/tab_model/tab_model.h"
+#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
+#include "content/public/browser/web_contents.h"
+#include "chrome/browser/profiles/profile.h"
+
 using content::DevToolsAgentHost;
 using extensions::mojom::ManifestLocation;
+
+std::string AppMenuBridge_GetRunningExtensionsInternal(Profile* profile, content::WebContents* web_contents);
 
 namespace extensions {
 
@@ -1015,6 +1023,8 @@ void ExtensionRegistrar::AddDisableFlagExemptedExtension(
 void ExtensionRegistrar::TerminateExtension(const ExtensionId& extension_id) {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
 
+  const ExtensionId saved_extension_id = extension_id;
+  LOG(INFO) << "[EXTENSIONS] Calling ExtensionRegistrar::TerminateExtension on id: " << extension_id;
   scoped_refptr<const Extension> extension =
       registry_->enabled_extensions().GetByID(extension_id);
   if (!extension)
@@ -1030,6 +1040,7 @@ void ExtensionRegistrar::TerminateExtension(const ExtensionId& extension_id) {
   registry_->AddTerminated(extension);
   registry_->RemoveEnabled(extension_id);
   DeactivateExtension(extension.get(), UnloadedExtensionReason::TERMINATE);
+  ReloadExtension(saved_extension_id, LoadErrorBehavior::kQuiet);
 }
 
 void ExtensionRegistrar::UntrackTerminatedExtension(

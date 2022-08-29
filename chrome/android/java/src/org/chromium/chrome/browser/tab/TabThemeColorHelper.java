@@ -46,6 +46,8 @@ public class TabThemeColorHelper extends EmptyTabObserver {
     @Override
     public void onUrlUpdated(Tab tab) {
         updateIfNeeded(tab, false);
+        if (tab != null && UrlUtilities.isNTPUrl(tab.getUrl().getSpec()))
+            updateIfNeeded(tab, true);
     }
 
     @Override

@@ -23,6 +23,8 @@ import org.chromium.ui.util.ColorUtils;
 
 import java.util.function.Supplier;
 
+import org.chromium.base.ContextUtils;
+
 /**
  * Manages the theme color used on the top part of the UI based on Tab's theme color and other
  * conditions such as dark mode settings, incognito mode, security state, etc.
