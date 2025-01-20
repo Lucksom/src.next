@@ -181,11 +181,11 @@ jobs:
         with:
           name: apk-x64
 
-      - name: Listing files under apk-arm
+      - name: Listing files under $HOME
         run: |
           pwd
           echo $HOME
-          ls -la apk-arm
+          ls -laR $HOME
 
       - name: Prepare release notes
         run: |
