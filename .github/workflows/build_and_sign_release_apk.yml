@@ -48,7 +48,7 @@ jobs:
         run: sudo -v ; wget https://downloads.rclone.org/v1.63.1/rclone-v1.63.1-linux-amd64.deb && sudo dpkg -i rclone-v1.63.1-linux-amd64.deb
 
       - name: Installing Python and OpenJDK
-        run: sudo apt-get install -y 2to3 python3-minimal python3 dh-python python-is-python3 openjdk-8-jdk-headless libncurses5 ccache jq
+        run: sudo apt-get install -y 2to3 python3-minimal python3 dh-python python-is-python3 openjdk-8-jdk-headless ccache jq
 
       - name: Reclaiming disk space on / by disabling swap partition
         run: |
