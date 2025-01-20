@@ -181,6 +181,12 @@ jobs:
         with:
           name: apk-x64
 
+      - name: Listing files under apk-arm
+        run: |
+          pwd
+          echo $HOME
+          ls -la apk-arm
+
       - name: Prepare release notes
         run: |
           cat ./apk-arm/last_commits.txt > release_notes.txt
