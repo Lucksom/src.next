@@ -165,21 +165,25 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: apk-arm
+          path: apk-arm
 
       - name: Downloading artifact (arm64)
         uses: actions/download-artifact@v4
         with:
           name: apk-arm64
+          path: apk-arm64
 
       - name: Downloading artifact (x86)
         uses: actions/download-artifact@v4
         with:
           name: apk-x86
+          path: apk-x86
 
       - name: Downloading artifact (x64)
         uses: actions/download-artifact@v4
         with:
           name: apk-x64
+          path: apk-x64
 
       - name: Listing files under $HOME
         run: |
